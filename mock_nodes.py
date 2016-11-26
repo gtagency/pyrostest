@@ -74,9 +74,14 @@ class TestNode:
         yield
 
 @contextlib.contextmanager
-def check_topic(topic, rosmsg_type, callback):
+def check_topic(topic, rosmsg_type, callback=None):
     """Context manager that monitors a rostopic and gets a message sent to it.
     """
+    if callback is None:
+        def default_callback(message):
+            return message
+        callback = default_callback
+
     rospy.init_node('test_'+topic.split('/')[-1], anonymous=True)
     test_node = TestNode(topic, rosmsg_type)
     new_callback = functools.partial(callback, test_node)
