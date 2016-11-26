@@ -100,4 +100,3 @@ def launch_node(package, name, namespace=None):
         return new_test
     return launcher
 
-
