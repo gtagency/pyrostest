@@ -8,6 +8,12 @@ import functools
 import time
 import rospy
 
+
+class NoMessage(Exception):
+    """Exception for a lack of message in a Node.
+    """
+    pass
+
 class MockNode:  # pylint: disable=too-few-public-methods
     """Mock of a node object for testing.
     """
@@ -32,7 +38,7 @@ def mock_pub(topic, rosmsg_type, queue_size=1):
     pub.unregister()
 
 
-class TestNode:  # pylint: disable=too-few-public-methods
+class TestNode:
     """Wrapper around a node used for testing.
     """
 
@@ -40,6 +46,18 @@ class TestNode:  # pylint: disable=too-few-public-methods
         self.topic = topic
         self.msg_type = msg_type
         self.received = False
+        self._message = None
+
+    @property
+    def message(self):
+        """Getter for the message property.
+
+        Makes sure you've actually recieved a message before providing one.
+        """
+        if not self.received:
+            raise NoMessage(('No message has been '
+                'published to {} yet').format(self.topic))
+        return self._message
 
     def wait_for_message(self, timeout=10):
         """Awaits a message on the node topic.
@@ -51,7 +69,8 @@ class TestNode:  # pylint: disable=too-few-public-methods
             time.sleep(.1)
             elapsed += .1
         if elapsed >= timeout:
-            raise TimeoutError('Test timed out')
+            raise TimeoutError(('Timed out waiting '
+                'for message on {}').format(self.topic))
         yield
 
 @contextlib.contextmanager
@@ -62,13 +81,15 @@ def check_topic(topic, rosmsg_type, callback):
     test_node = TestNode(topic, rosmsg_type)
     new_callback = functools.partial(callback, test_node)
 
-    def cb_wrapper(test_node):
+    def cb_wrapper(message):
         """Wrapper around the user-provided callback.
 
         Sets a flag to be used by other methods.
         """
         test_node.received = True
-        return new_callback(test_node)
+        test_node._message = message  # pylint: disable=protected-access
+
+        return new_callback(message)
 
     rospy.Subscriber(topic, rosmsg_type, cb_wrapper)
     yield test_node
