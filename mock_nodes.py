@@ -14,7 +14,7 @@ class NoMessage(Exception):
     """
     pass
 
-class MockNode:  # pylint: disable=too-few-public-methods
+class MockNode:
     """Mock of a node object for testing.
     """
     def __init__(self, topic, msg_type, node):
@@ -79,6 +79,8 @@ def check_topic(topic, rosmsg_type, callback=None):
     """
     if callback is None:
         def default_callback(message):
+            """A no-op callback for default use.
+            """
             return message
         callback = default_callback
 
