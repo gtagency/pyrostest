@@ -33,3 +33,9 @@ def with_roscore(obj):
     obj.setUp = new_setup
     obj.tearDown = new_teardown
     return obj
+
+def await(gen):
+    """Shim to add await syntax to python2, kinda.
+    """
+    for item in gen:
+        yield item
