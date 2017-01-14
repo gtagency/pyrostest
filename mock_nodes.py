@@ -20,7 +20,7 @@ class NoMessage(Exception):
     """
     pass
 
-class MockNode(object)
+class MockNode(object):
     """Mock of a node object for testing.
     """
     def __init__(self, topic, msg_type, node):
