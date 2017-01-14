@@ -8,13 +8,19 @@ import functools
 import time
 import rospy
 
+class TimeoutError(Exception):
+    """Py3 shim, represents no response from a syscall.
+    """
+    pass
+
+
 
 class NoMessage(Exception):
     """Exception for a lack of message in a Node.
     """
     pass
 
-class MockNode:
+class MockNode(object)
     """Mock of a node object for testing.
     """
     def __init__(self, topic, msg_type, node):
@@ -38,7 +44,7 @@ def mock_pub(topic, rosmsg_type, queue_size=1):
     pub.unregister()
 
 
-class TestNode:
+class TestNode(object):
     """Wrapper around a node used for testing.
     """
 

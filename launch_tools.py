@@ -14,7 +14,7 @@ class ROSLauncher(roslaunch.scriptapi.ROSLaunch):
     `which roslaunch`.
     """
     def __init__(self, files):
-        super(roslaunch.scriptapi.ROSLaunch, self).__init__()
+        super(ROSLauncher, self).__init__()
         uuid = roslaunch.rlutil.get_or_generate_uuid(None, True)
         self.parent = roslaunch.parent.ROSLaunchParent(uuid,
                 files, is_core=False)
