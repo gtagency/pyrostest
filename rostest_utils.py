@@ -36,6 +36,21 @@ def with_roscore(obj):
 
 def await(gen):
     """Shim to add await syntax to python2, kinda.
+
+    On a high level, this function simply takes the next item from a generator
+    and passes it along, but it blocks until that item is gotten. When used in
+    the context
+
+        await(TestNode.wait_for_message())
+
+    it will wait for the `wait_for_message` call to yield the first (and only)
+    time. This will happen only if the node has received a message 
+    (`self.recieved == True`), which means that you can then safely poll for
+    the recieved message (`TestNode.message.data` or otherwise).
+
+    In other words, if await(Node) doesn't raise an error, you should have
+    successfully recieved a message, and can therefore test against it, 
+    otherwise the message access can raise a NoMessage error.
     """
     for item in gen:
         yield item
