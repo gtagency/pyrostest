@@ -107,9 +107,7 @@ def check_topic(topic, rosmsg_type, callback=None):
     try:
         yield test_node
     finally:
-        sub.unregister()
         rospy.signal_shutdown('test complete')
-        reload(rospy)
 
         # Ros really doesn't want you to reinitialize a node once it's been
         # shutdown because there can be bad side effects, but we are good
