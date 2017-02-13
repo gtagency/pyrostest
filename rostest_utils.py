@@ -43,14 +43,13 @@ def await(gen):
 
         await(TestNode.wait_for_message())
 
-    it will wait for the `wait_for_message` call to yield the first (and only)
-    time. This will happen only if the node has received a message
-    (`self.recieved == True`), which means that you can then safely poll for
-    the recieved message (`TestNode.message.data` or otherwise).
+    it will wait for the `wait_for_message` call to finish running.
 
     In other words, if await(Node) doesn't raise an error, you should have
     successfully recieved a message, and can therefore test against it,
     otherwise the message access can raise a NoMessage error.
     """
+    res = None
     for item in gen:
-        yield item
+        res = item
+    return res
