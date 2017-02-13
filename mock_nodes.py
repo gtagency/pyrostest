@@ -102,7 +102,7 @@ def check_topic(topic, rosmsg_type, callback=None):
 
         return callback(message)
 
-    sub = rospy.Subscriber(topic, rosmsg_type, cb_wrapper)
+    rospy.Subscriber(topic, rosmsg_type, cb_wrapper)
     try:
         yield test_node
     finally:
