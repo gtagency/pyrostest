@@ -4,7 +4,6 @@ Contains tools to send and recieve data from fake nodes and topics.
 """
 
 import contextlib
-import functools
 import time
 import rospy
 
