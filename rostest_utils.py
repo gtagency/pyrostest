@@ -5,6 +5,7 @@ import os
 import random
 import subprocess
 import unittest
+import socket
 
 
 def rand_port():
@@ -37,7 +38,8 @@ class RosTestMeta(type):
             """Wrapper around the user-defined setUp method that runs roscore.
             """
             self.port = rand_port()
-            self.rosmaster_uri = 'http://localhost:{}'.format(self.port)
+            self.rosmaster_uri = 'http://{}:{}'.format(socket.gethostname(),
+                    self.port)
             env = {k:v for k, v in os.environ.iteritems()}
             env.update({'ROS_MASTER_URI': self.rosmaster_uri})
             try:
