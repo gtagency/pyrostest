@@ -1,9 +1,19 @@
 """Utilities for launching ros nodes for tests.
 """
+import os
 import functools
 import time
 import roslaunch
 import rosnode
+import rosgraph
+
+
+def my_get_node_names(namespace=None, uri='http://localhost:11311'):
+    old_master = rosgraph.Master
+    rosgraph.Master = functools.partial(rosgraph.Master, master_uri=uri)
+    nodenames = rosnode.get_node_names(namespace=namespace)
+    rosgraph.Master = old_master
+    return nodenames
 
 
 class ROSLauncher(roslaunch.scriptapi.ROSLaunch):
@@ -13,17 +23,14 @@ class ROSLauncher(roslaunch.scriptapi.ROSLaunch):
     This was found by peering into the roslaunch util source code from
     `which roslaunch`.
     """
-    def __init__(self, files):
+    def __init__(self, files, port=11311):
         super(ROSLauncher, self).__init__()
         uuid = roslaunch.rlutil.get_or_generate_uuid(None, True)
         self.parent = roslaunch.parent.ROSLaunchParent(uuid,
-                files, is_core=False)
+                files, is_core=False, port=port)
 
-# TODO(joshuamorton@gatech.edu): swap this to a Map[int, launcher], where the
-# int is incrementally generated and stored within the calling decorator. This
-# will prevent the issue of overwriting or cross writing if it becomes a
-# danger.
-_LAUNCHER = None
+
+_LAUNCHER = dict()
 
 def with_launch_file(package, launch):
     """Decorator to source a launch file for running nodes.
@@ -44,13 +51,13 @@ def with_launch_file(package, launch):
         def new_test(self):
             """Wrapper around the user provided test that runs a launch file.
             """
-            launch = ROSLauncher(full_name)
+            os.environ['ROS_MASTER_URI'] = self.rosmaster_uri
+            launch = ROSLauncher(full_name, port=self.port)
             launch.start()
-            global _LAUNCHER # pylint: disable=global-statement
-            _LAUNCHER = launch
+            _LAUNCHER[self.port] = launch
 
             temp = func(self)
-            _launcher = None
+            _LAUNCHER[self.port] = None
             return temp
         return new_test
     return launcher
@@ -70,22 +77,23 @@ def launch_node(package, name, namespace=None):
         def new_test(self):
             """Wrapper around the user-provided test that runs a ros node.
             """
-            node = roslaunch.core.Node(package, name, namespace=namespace)
+            env = {'ROS_MASTER_URI': self.rosmaster_uri}
+            node = roslaunch.core.Node(package, name, namespace=namespace,
+                    env_args=env.iteritems())
             is_master = False
-            global _LAUNCHER # pylint: disable=global-statement
-            if _LAUNCHER is None:
+            if _LAUNCHER[self.port] is None:
                 launch = roslaunch.scriptapi.ROSLaunch()
                 launch.start()
-                _LAUNCHER = launch
+                _LAUNCHER[self.port] = launch
                 is_master = True
             else:
-                launch = _LAUNCHER
+                launch = _LAUNCHER[self.port]
 
             process = launch.launch(node)
             # Beware this is a bit of a hack, and will currently not work if we
             # want to run more than 1 node with the same name.
             while not any(nn.split('/')[-1].startswith(name.replace('.', '_'))
-                    for nn in rosnode.get_node_names()):
+                    for nn in my_get_node_names(uri=self.rosmaster_uri)):
                 time.sleep(.1)
             try:
                 temp = func(self)

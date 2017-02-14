@@ -16,20 +16,36 @@ def rand_port():
 
 
 class RosTestMeta(type):
-    def __init__(cls, name, bases, dct):
-        super(RosTestMeta, cls).__init__(name, bases, dct)
+    def __new__(cls, name, bases, dct):
 
-        old_setup = dct['setUp']
-        old_teardown = dct['tearDown']
+        # It will break unless we throw in fake setup and teardown methods if
+        # the real ones don't exist yet.
+
+        def fake_settear(self):
+            _ = self
+
+        try:
+            old_setup = dct['setUp']
+        except KeyError:
+            old_setup = fake_settear
+        try:
+            old_teardown = dct['tearDown']
+        except KeyError:
+            old_teardown = fake_settear
 
         def new_setup(self):
             """Wrapper around the user-defined setUp method that runs roscore.
             """
             self.port = rand_port()
+            self.rosmaster_uri = 'http://localhost:{}'.format(self.port)
             env = {k:v for k, v in os.environ.iteritems()}
-            env.update({'ROS_MASTER_URI':'http://localhost:{}'.format(self.port)})
-            self.roscore = subprocess.Popen(['roscore', '-p', str(self.port)],
-                    env=env)
+            env.update({'ROS_MASTER_URI': self.rosmaster_uri})
+            try:
+                #TODO: make this retry on fail, or something similar.
+                self.roscore = subprocess.Popen(
+                        ['roscore', '-p', str(self.port)], env=env)
+            except:
+                raise Exception('port not availible')
             old_setup(self)
 
         def new_teardown(self):
@@ -41,6 +57,9 @@ class RosTestMeta(type):
 
         dct['setUp'] = new_setup
         dct['tearDown'] = new_teardown
+        dct['setUp'].__name__ = 'setUp'
+        dct['tearDown'].__name__ = 'tearDown'
+        return super(RosTestMeta, cls).__new__(cls, name, bases, dct)
 
 
 class RosTest(unittest.TestCase):
@@ -48,10 +67,7 @@ class RosTest(unittest.TestCase):
 
     self.port is the port this instance will run on.
     """
-
-    def __init__(self):
-        super(RosTest, self).__init__()
-        self.port = 11311  # default ros port
+    __metaclass__ = RosTestMeta
 
 
 def await(gen):
