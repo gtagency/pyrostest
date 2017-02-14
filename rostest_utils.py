@@ -1,38 +1,58 @@
 """A collection of utilities to make testing with ros less painful.
 """
 
+import os
+import random
 import subprocess
+import unittest
 
-def with_roscore(obj):
-    """Decorator to run all tests in a testcase with their own roscore.
 
-    This wraps the setUp and tearDown methods to start by first spinning up a
-    roscore process, and tears it down at the very end. This adds a small time
-    penalty, but its worth it.
+def rand_port():
+    """Picks a random port number.
 
-    Its worth deciding whether to make this work on a per-method, per object,
-    or both basis.
+    This is potentially unsafe, but shouldn't generally be a problem.
     """
-    old_setup = obj.setUp
-    old_teardown = obj.tearDown
+    return random.randint(10311, 12311)
 
-    def new_setup(self):
-        """Wrapper around the user-defined setUp method that runs roscore.
-        """
-        self.roscore = subprocess.Popen(['roscore'])
-        old_setup(self)
 
-    def new_teardown(self):
-        """Wrapper around the user-defined tearDown method that ends roscore.
-        """
-        old_teardown(self)
-        self.roscore.kill()
-        subprocess.call(['killall', '-9', 'rosmaster'])
-        self.roscore.wait()
+class RosTestMeta(type):
+    def __init__(cls, name, bases, dct):
+        super(RosTestMeta, cls).__init__(name, bases, dct)
 
-    obj.setUp = new_setup
-    obj.tearDown = new_teardown
-    return obj
+        old_setup = dct['setUp']
+        old_teardown = dct['tearDown']
+
+        def new_setup(self):
+            """Wrapper around the user-defined setUp method that runs roscore.
+            """
+            self.port = rand_port()
+            env = {k:v for k, v in os.environ.iteritems()}
+            env.update({'ROS_MASTER_URI':'http://localhost:{}'.format(self.port)})
+            self.roscore = subprocess.Popen(['roscore', '-p', str(self.port)],
+                    env=env)
+            old_setup(self)
+
+        def new_teardown(self):
+            """Wrapper around the user-defined tearDown method that ends roscore.
+            """
+            old_teardown(self)
+            self.roscore.kill()
+            self.roscore.wait()
+
+        dct['setUp'] = new_setup
+        dct['tearDown'] = new_teardown
+
+
+class RosTest(unittest.TestCase):
+    """A subclass of TestCase that exposes some additional ros-related attrs.
+
+    self.port is the port this instance will run on.
+    """
+
+    def __init__(self):
+        super(RosTest, self).__init__()
+        self.port = 11311  # default ros port
+
 
 def await(gen):
     """Shim to add await syntax to python2, kinda.
