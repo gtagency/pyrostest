@@ -22,17 +22,17 @@ class RosTestMeta(type):
         # It will break unless we throw in fake setup and teardown methods if
         # the real ones don't exist yet.
 
-        def fake_settear(self):
-            _ = self
+        def noop(_):
+            pass
 
         try:
             old_setup = dct['setUp']
         except KeyError:
-            old_setup = fake_settear
+            old_setup = noop
         try:
             old_teardown = dct['tearDown']
         except KeyError:
-            old_teardown = fake_settear
+            old_teardown = noop
 
         def new_setup(self):
             """Wrapper around the user-defined setUp method that runs roscore.
