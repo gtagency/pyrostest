@@ -102,6 +102,7 @@ def with_launch_file(package, launch):
             _LAUNCHER[self.port] = launch
 
             temp = func(self)
+            _LAUNCHER[self.port].stop()
             del _LAUNCHER[self.port]
             return temp
         return new_test
@@ -148,6 +149,7 @@ def launch_node(package, name, namespace=None):
             finally:
                 process.stop()
             if is_master:
+                _LAUNCHER[self.port].stop()
                 del _LAUNCHER[self.port]
             return temp
 

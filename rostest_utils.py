@@ -2,10 +2,14 @@
 """
 
 import os
+import signal
 import random
 import subprocess
 import unittest
 import socket
+import time
+import logging
+import rosgraph
 
 
 def rand_port():
@@ -49,20 +53,33 @@ class RosTestMeta(type):
                     self.port)
             env = {k:v for k, v in os.environ.iteritems()}
             env.update({'ROS_MASTER_URI': self.rosmaster_uri})
-            try:
-                #TODO: make this retry on fail, or something similar.
+            roscore_initialized = False
+            logging.basicConfig()
+            log = logging.getLogger(__name__)
+            log.warning(name)
+            while not roscore_initialized:
                 self.roscore = subprocess.Popen(
                         ['roscore', '-p', str(self.port)], env=env)
-            except:
-                raise Exception('port not availible')
+                # an error will return a nonzero errorcode, and None indicates
+                # that the process is still running, so falsy results are good
+                time.sleep(3)
+                if not self.roscore.poll():
+                    roscore_initialized = True
+                else:
+                    self.roscore.kill()
+                    self.roscore = None
             old_setup(self)
 
         def new_teardown(self):
             """Wrapper around the user-defined tearDown method to end roscore.
             """
+            rosmaster_pid = rosgraph.masterapi.Master('roslib',
+                    master_uri=self.rosmaster_uri).getPid()
             old_teardown(self)
             self.roscore.kill()
             self.roscore.wait()
+            self.roscore = None
+            os.kill(rosmaster_pid, signal.SIGTERM)
 
         dct['setUp'] = new_setup
         dct['tearDown'] = new_teardown
