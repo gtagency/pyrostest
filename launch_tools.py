@@ -96,7 +96,7 @@ def with_launch_file(package, launch):
             os.environ['ROS_MASTER_URI'] = self.rosmaster_uri
             launch = ROSLauncher(full_name, port=self.port)
             launch.start()
-            if _LAUNCHER[self.port]:
+            if self.port in _LAUNCHER:
                 raise Exception('You are using these incorrectly')
 
             _LAUNCHER[self.port] = launch
@@ -126,7 +126,8 @@ def launch_node(package, name, namespace=None):
             node = roslaunch.core.Node(package, name, namespace=namespace,
                     env_args=env.iteritems())
             is_master = False
-            if _LAUNCHER[self.port] is None:
+            if self.port not in _LAUNCHER:
+                raise Exception('this should not happen rn')
                 launch = roslaunch.scriptapi.ROSLaunch()
                 launch.start()
                 _LAUNCHER[self.port] = launch
