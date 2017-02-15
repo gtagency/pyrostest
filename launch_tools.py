@@ -32,16 +32,56 @@ class ROSLauncher(roslaunch.scriptapi.ROSLaunch):
 
 _LAUNCHER = dict()
 
+# The following two methods are intended for use together. You need to be
+# aware of the following limitations:
+# `with_launch_file` should always be called first. That is:
+#
+# ```
+# @with_launch_file(*args)
+# @launch_node(*node_args)
+# def test_function(self):
+#     ...
+# ```
+
+# is valid, as is
+#
+# ```
+# @launch_node(*node_args)
+# @launch_node(*other_node_args)
+# def test_function(self):
+#     ...
+# ```
+# however, neither of these would be valid:
+#
+# ```
+# @launch_node(*node_args)
+# @with_launch_file(*args)
+# def test_function(self):
+#     ...
+# ```
+#
+# ```
+# @with_launch_file(*args)
+# @launch_node(*node_args)
+# @with_launch_file(*more_launch_args)
+# def test_function(self):
+#     ...
+# ```
+#
+# this is handled by having `with_launch_file` check for a running launcher for
+# its rosmaster port, and if one exists already, raising an error. Otherwise it
+# just works.
+# Similarly, launch_node will use a launcher if one exists, otherwise the
+# outermost launch_node will create a master launcher and clean up after itself
+# and all child nodes launched for the test.
+
 def with_launch_file(package, launch):
     """Decorator to source a launch file for running nodes.
 
     This should always be run first.
 
-    This and launch nodes work together gracefully, but this poses a danger.
-    Because they rely on a global variable, multiple running simultaneously
-    (in the same thread) can cause issues by overwriting the 'launcher'
-    value. This could be fixed if needed, but I don't think it will be an
-    issue.
+    This and launch nodes work together gracefully, as long as you follow the
+    guidelines outlined in `buzzmobile/tests/test_utils/launch_tools.py`.
     """
     full_name = roslaunch.rlutil.resolve_launch_arguments([package, launch])
     def launcher(func):
@@ -54,10 +94,13 @@ def with_launch_file(package, launch):
             os.environ['ROS_MASTER_URI'] = self.rosmaster_uri
             launch = ROSLauncher(full_name, port=self.port)
             launch.start()
+            if _LAUNCHER[self.port]:
+                raise Exception('You are using these incorrectly')
+
             _LAUNCHER[self.port] = launch
 
             temp = func(self)
-            _LAUNCHER[self.port] = None
+            del _LAUNCHER[self.port]
             return temp
         return new_test
     return launcher
@@ -102,7 +145,7 @@ def launch_node(package, name, namespace=None):
             finally:
                 process.stop()
             if is_master:
-                _launcher = None
+                del _LAUNCHER[self.port]
             return temp
 
         return new_test
