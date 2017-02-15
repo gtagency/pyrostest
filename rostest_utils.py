@@ -10,7 +10,13 @@ import socket
 import time
 import logging
 import rosgraph
+import rosnode
+import psutil
 
+try: 
+    from xmlrpc.client import ServerProxy 
+except ImportError: 
+    from xmlrpclib import ServerProxy
 
 def rand_port():
     """Picks a random port number.
@@ -73,13 +79,18 @@ class RosTestMeta(type):
         def new_teardown(self):
             """Wrapper around the user-defined tearDown method to end roscore.
             """
-            rosmaster_pid = rosgraph.masterapi.Master('roslib',
-                    master_uri=self.rosmaster_uri).getPid()
+            master = rosgraph.masterapi.Master('roslib', 
+                    master_uri=self.rosmaster_uri)
+            rosmaster_pid = master.getPid()
+            rosout_node = ServerProxy(rosnode.get_api_uri(master, 'rosout'))
+            rosout_pid = rosout_node.getPid('roslog')[-1]
+
             old_teardown(self)
             self.roscore.kill()
             self.roscore.wait()
             self.roscore = None
             os.kill(rosmaster_pid, signal.SIGTERM)
+            os.kill(rosout_pid, signal.SIGTERM)
 
         dct['setUp'] = new_setup
         dct['tearDown'] = new_teardown
