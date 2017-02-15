@@ -9,6 +9,8 @@ import rosgraph
 
 
 def my_get_node_names(namespace=None, uri='http://localhost:11311'):
+    """Monkeypatches get_node_names with a non-default ROS_MASTER_URI.
+    """
     old_master = rosgraph.Master
     rosgraph.Master = functools.partial(rosgraph.Master, master_uri=uri)
     nodenames = rosnode.get_node_names(namespace=namespace)

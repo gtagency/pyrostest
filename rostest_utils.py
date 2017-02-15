@@ -17,12 +17,19 @@ def rand_port():
 
 
 class RosTestMeta(type):
-    def __new__(cls, name, bases, dct):
+    """Metaclass for RosTest that adds the setup/teardown we want.
+    """
+    def __new__(mcs, name, bases, dct):
 
         # It will break unless we throw in fake setup and teardown methods if
         # the real ones don't exist yet.
 
         def noop(_):
+            """Do nothing function.
+
+            This is injected if there is no user-defined setUp or tearDown
+            method on an instance of RosTest.
+            """
             pass
 
         try:
@@ -51,7 +58,7 @@ class RosTestMeta(type):
             old_setup(self)
 
         def new_teardown(self):
-            """Wrapper around the user-defined tearDown method that ends roscore.
+            """Wrapper around the user-defined tearDown method to end roscore.
             """
             old_teardown(self)
             self.roscore.kill()
@@ -61,13 +68,14 @@ class RosTestMeta(type):
         dct['tearDown'] = new_teardown
         dct['setUp'].__name__ = 'setUp'
         dct['tearDown'].__name__ = 'tearDown'
-        return super(RosTestMeta, cls).__new__(cls, name, bases, dct)
+        return super(RosTestMeta, mcs).__new__(mcs, name, bases, dct)
 
 
 class RosTest(unittest.TestCase):
     """A subclass of TestCase that exposes some additional ros-related attrs.
 
     self.port is the port this instance will run on.
+    self.rosmaster_uri is equivalent to the ROS_MASTER_URI environmental var
     """
     __metaclass__ = RosTestMeta
 
