@@ -1,5 +1,8 @@
 #! /usr/bin/env python
 
+"""A rosnode in a subprocess that will publish input from stdin.
+"""
+
 import cPickle as pickle
 import sys
 from StringIO import StringIO
@@ -8,18 +11,20 @@ import rospy
 
 
 def publish(topic, msg_type):
+    """A function to isolate the publishing logic.
+    """
     rospy.init_node('mock_publish_'+topic.split('/')[-1], anonymous=True,
             disable_signals=True)
-    pub = rospy.Publisher(topic, msg_type, queue_size)
+    pub = rospy.Publisher(topic, msg_type, QUEUE_SIZE)
     msg = msg_type()
-    s = StringIO()
-    msg.serialize(s)
+    sio = StringIO()
+    msg.serialize(sio)
     while 1:
-        data = sys.stdin.read(s.len)
+        data = sys.stdin.read(sio.len)
         msg.deserialize(data)
         pub.publish(msg)
-        
+
 
 if __name__ == '__main__':
-    rostopic, rosmsg_type, queue_size = pickle.loads(sys.argv[1])
-    publish(rostopic, rosmsg_type)
+    ROSTOPIC, ROSMSG_TYPE, QUEUE_SIZE = pickle.loads(sys.argv[1])
+    publish(ROSTOPIC, ROSMSG_TYPE)

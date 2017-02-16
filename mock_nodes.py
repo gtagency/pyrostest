@@ -42,6 +42,8 @@ class MockPublisher(object):
         time.sleep(.2)
 
     def kill(self):
+        """Kills the publisher ros node process.
+        """
         self.proc.kill()
 
 
@@ -71,11 +73,13 @@ class MockListener(object):
 
         # do this better, somehow!
         location = './tests/test_utils/listener.py'
-        self.proc = subprocess.Popen([location, 
+        self.proc = subprocess.Popen([location,
             pickle.dumps((topic, msg_type))], stdout=subprocess.PIPE)
         self._message = None
 
     def kill(self):
+        """Kills the subscriber ros node process.
+        """
         self.proc.kill()
 
     @property
@@ -86,9 +90,9 @@ class MockListener(object):
         """
         if  not self._message:
             msg = self.msg_type()
-            s = StringIO()
-            msg.serialize(s)
-            data = self.proc.stdout.read(s.len)
+            sio = StringIO()
+            msg.serialize(sio)
+            data = self.proc.stdout.read(sio.len)
             msg.deserialize(data)
             self._message = msg
         return self._message

@@ -69,8 +69,8 @@ class RosTestMeta(type):
         def new_teardown(self):
             """Wrapper around the user-defined tearDown method to end roscore.
             """
-            p = psutil.Process(self.roscore.pid)
-            children = p.children(recursive=True)
+            proc = psutil.Process(self.roscore.pid)
+            children = proc.children(recursive=True)
 
             old_teardown(self)
             self.roscore.kill()
