@@ -9,6 +9,10 @@ import roslaunch
 import rosnode
 
 
+class RosLaunchException(Exception):
+    pass
+
+
 def my_get_node_names(namespace=None, uri='http://localhost:11311'):
     """Monkeypatches get_node_names with a non-default ROS_MASTER_URI.
     """
@@ -98,7 +102,9 @@ def with_launch_file(package, launch):
             launch = ROSLauncher(full_name, port=self.port)
             launch.start()
             if self.port in _LAUNCHER:
-                raise Exception('You are using these incorrectly')
+                raise RosLaunchException('You are using this decorator '
+                'incorrectly. You must call use @with_launch_file only once '
+                'for any single test.')
 
             _LAUNCHER[self.port] = launch
 

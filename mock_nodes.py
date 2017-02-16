@@ -30,6 +30,7 @@ class MockPublisher(object):
         self.topic = topic
         self.msg_type = msg_type
         pub_data = pickle.dumps((topic, msg_type, queue_size))
+        # this might be fragile if not run from the ci_scripts/unittest command
         location = './tests/test_utils/publisher.py'
         self.proc = subprocess.Popen([location, pub_data],
                 stdin=subprocess.PIPE)
@@ -69,9 +70,8 @@ class MockListener(object):
     def __init__(self, topic, msg_type):
         self.topic = topic
         self.msg_type = msg_type
-        # get port and rosmaster uri cleanly
 
-        # do this better, somehow!
+        # this might be fragile if not run from the ci_scripts/unittest command
         location = './tests/test_utils/listener.py'
         self.proc = subprocess.Popen([location,
             pickle.dumps((topic, msg_type))], stdout=subprocess.PIPE)
@@ -81,6 +81,7 @@ class MockListener(object):
         """Kills the subscriber ros node process.
         """
         self.proc.kill()
+        self.proc.wait()
 
     @property
     def message(self):
@@ -92,6 +93,12 @@ class MockListener(object):
             msg = self.msg_type()
             sio = StringIO()
             msg.serialize(sio)
+            # This weird business with StringIO is to make sure we read the
+            # correct number of bytes. Essentially, a serialized ros message
+            # is a fixed length string sent over the channel, so we serialize
+            # the default message of a type and then read that number of bytes
+            # so that we don't encounter any issues with reading too much or
+            # too little data.
             data = self.proc.stdout.read(sio.len)
             msg.deserialize(data)
             self._message = msg

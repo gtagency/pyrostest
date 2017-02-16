@@ -1,6 +1,12 @@
 #! /usr/bin/env python
 
 """A rosnode in a subprocess that will publish input from stdin.
+
+This takes in a pickled tuple of three values: ROSTOPIC, ROSMSG_TYPE, and
+QUEUE_SIZE as its only command line argument. This means that it must be able
+to unpickle the ROSMSG_TYPE argument, which requires importing std_msgs or
+similar packages. So rosinit must have been done on this thread. This will have
+been done by default, but might be a cause for odd issues.
 """
 
 import cPickle as pickle

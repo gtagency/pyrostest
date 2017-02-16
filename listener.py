@@ -1,6 +1,12 @@
 #! /usr/bin/env python
 
 """A ros node that will subscribe to a single message and print it to stdout.
+
+It takes in pickled configuration string that should be the ROSTOPIC and
+ROSMSG_TYPE pickled on the other end. This also means that this node must be
+run from a context where it can import any of the buzzmobile ros messages.
+
+It prints the recieved data to stdout serialized for use by the main thread.
 """
 import cPickle as pickle
 import sys
