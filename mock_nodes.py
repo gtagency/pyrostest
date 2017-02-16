@@ -4,12 +4,13 @@ Contains tools to send and recieve data from fake nodes and topics.
 """
 
 import contextlib
-import time
-import subprocess
 import cPickle as pickle
+import subprocess
+import time
 from StringIO import StringIO
 
 import rosnode
+
 
 class TimeoutError(Exception):
     """Py3 shim, represents no response from a syscall.
@@ -108,4 +109,3 @@ def check_topic(topic, rosmsg_type):
         yield test_node
     finally:
         test_node.kill()
-

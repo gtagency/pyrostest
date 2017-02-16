@@ -1,11 +1,12 @@
 """Utilities for launching ros nodes for tests.
 """
-import os
 import functools
+import os
 import time
+
+import rosgraph
 import roslaunch
 import rosnode
-import rosgraph
 
 
 def my_get_node_names(namespace=None, uri='http://localhost:11311'):
@@ -154,4 +155,3 @@ def launch_node(package, name, namespace=None):
 
         return new_test
     return launcher
-

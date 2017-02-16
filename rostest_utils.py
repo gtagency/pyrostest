@@ -3,10 +3,11 @@
 
 import os
 import random
-import subprocess
-import unittest
 import socket
+import subprocess
 import time
+import unittest
+
 import psutil
 
 

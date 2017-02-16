@@ -6,6 +6,7 @@ from StringIO import StringIO
 
 import rospy
 
+
 def publish(topic, msg_type):
     rospy.init_node('mock_publish_'+topic.split('/')[-1], anonymous=True,
             disable_signals=True)
@@ -22,5 +23,3 @@ def publish(topic, msg_type):
 if __name__ == '__main__':
     rostopic, rosmsg_type, queue_size = pickle.loads(sys.argv[1])
     publish(rostopic, rosmsg_type)
-
-

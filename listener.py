@@ -5,6 +5,7 @@ import sys
 
 import rospy
 
+
 def listen(topic, msg_type):
     rospy.init_node('mock_listen_'+topic.split('/')[-1], anonymous=True,
             disable_signals=True)
@@ -19,5 +20,3 @@ def listen(topic, msg_type):
 if __name__ == '__main__':
     rostopic, rosmsg_type = pickle.loads(sys.argv[1])
     listen(rostopic, rosmsg_type)
-
-
