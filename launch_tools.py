@@ -128,7 +128,6 @@ def launch_node(package, name, namespace=None):
                     env_args=env.iteritems())
             is_master = False
             if self.port not in _LAUNCHER:
-                raise Exception('this should not happen rn')
                 launch = roslaunch.scriptapi.ROSLaunch()
                 launch.start()
                 _LAUNCHER[self.port] = launch

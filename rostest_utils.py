@@ -2,21 +2,13 @@
 """
 
 import os
-import signal
 import random
 import subprocess
 import unittest
 import socket
 import time
-import logging
-import rosgraph
-import rosnode
 import psutil
 
-try: 
-    from xmlrpc.client import ServerProxy 
-except ImportError: 
-    from xmlrpclib import ServerProxy
 
 def rand_port():
     """Picks a random port number.
@@ -60,9 +52,6 @@ class RosTestMeta(type):
             env = {k:v for k, v in os.environ.iteritems()}
             env.update({'ROS_MASTER_URI': self.rosmaster_uri})
             roscore_initialized = False
-            logging.basicConfig()
-            log = logging.getLogger(__name__)
-            log.warning(name)
             while not roscore_initialized:
                 self.roscore = subprocess.Popen(
                         ['roscore', '-p', str(self.port)], env=env)
@@ -79,18 +68,17 @@ class RosTestMeta(type):
         def new_teardown(self):
             """Wrapper around the user-defined tearDown method to end roscore.
             """
-            master = rosgraph.masterapi.Master('roslib', 
-                    master_uri=self.rosmaster_uri)
-            rosmaster_pid = master.getPid()
-            rosout_node = ServerProxy(rosnode.get_api_uri(master, 'rosout'))
-            rosout_pid = rosout_node.getPid('roslog')[-1]
+            p = psutil.Process(self.roscore.pid)
+            children = p.children(recursive=True)
 
             old_teardown(self)
             self.roscore.kill()
             self.roscore.wait()
             self.roscore = None
-            os.kill(rosmaster_pid, signal.SIGTERM)
-            os.kill(rosout_pid, signal.SIGTERM)
+            for child in children:
+                child.terminate()
+                child.wait()
+
 
         dct['setUp'] = new_setup
         dct['tearDown'] = new_teardown
@@ -106,24 +94,3 @@ class RosTest(unittest.TestCase):
     self.rosmaster_uri is equivalent to the ROS_MASTER_URI environmental var
     """
     __metaclass__ = RosTestMeta
-
-
-def await(gen):
-    """Shim to add await syntax to python2, kinda.
-
-    On a high level, this function simply takes the next item from a generator
-    and passes it along, but it blocks until that item is gotten. When used in
-    the context
-
-        await(TestNode.wait_for_message())
-
-    it will wait for the `wait_for_message` call to finish running.
-
-    In other words, if await(Node) doesn't raise an error, you should have
-    successfully recieved a message, and can therefore test against it,
-    otherwise the message access can raise a NoMessage error.
-    """
-    res = None
-    for item in gen:
-        res = item
-    return res
