@@ -117,8 +117,8 @@ def with_launch_file(package, launch, **kwargs):
 
             try:
                 temp = func(self)
-            except Exception as e:
-                raise e
+            except Exception as exc:
+                raise exc
             finally:
                 _LAUNCHER[self.port].stop()
                 # clean argvs from sys.argv
