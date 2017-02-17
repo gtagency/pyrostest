@@ -5,9 +5,9 @@ without having to deal with the normal rostesting library.
 
 ## Quick Notes
 
- - If your tests are inexplicably failing, run `rm -r *.pyc`, especially if you
-   recently pulled or checked out a branch. The .pyc files are not managed by
-   vcs and will be used sometimes when they shouldn't be.
+ - If your tests are inexplicably failing or hanging, run `rm -r *.pyc`,
+   especially if you recently pulled or checked out a branch. The .pyc files are
+   not managed by vcs and will be used sometimes when they shouldn't be.
 
 ## API
 
@@ -136,7 +136,11 @@ class TestExample(RosTest):
     # identical to add_one above.
     def test_chain_of_events(self):
         with mock_pub('/input', Flaot64, queue_size=0) as p:
-            with check_topic('/result', Float64) as r:
+            with check_topic('/result', Float64, timeout=3) as r:
+                # uses a shorter timeout because this test should run quickly,
+                # as might be the case for realtime tests. You can also use a
+                # longer timeout, for a slow test, but 10 should be long
+                # enough for most of our usecases.
                 p.send(Float64(7))
                 assert ct.message.data == 9
 

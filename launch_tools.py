@@ -106,7 +106,7 @@ def with_launch_file(package, launch):
             if self.port in _LAUNCHER:
                 raise RosLaunchException('Rosmaster port {} already in use. '
                 'You must call use @with_launch_file only once for any single '
-                'test.'.format(self.port))
+                'test, and before any @launch_node calls.'.format(self.port))
 
             _LAUNCHER[self.port] = launch
 
