@@ -109,8 +109,9 @@ class MockListener(object):
                 self.proc.kill()
                 self.killed = True
 
-            timer = threading.Timer(kill_proc, self.proc.kill)
+            timer = threading.Timer(self.timeout, kill_proc)
             try:
+                timer.start()
                 data = self.proc.stdout.read(sio.len)
             finally:
                 timer.cancel()
