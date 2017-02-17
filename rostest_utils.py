@@ -58,7 +58,7 @@ class RosTestMeta(type):
                         ['roscore', '-p', str(self.port)], env=env)
                 # an error will return a nonzero errorcode, and None indicates
                 # that the process is still running, so falsy results are good
-                time.sleep(3)
+                time.sleep(1)
                 if not self.roscore.poll():
                     roscore_initialized = True
                 else:
