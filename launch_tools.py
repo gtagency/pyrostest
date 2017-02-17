@@ -102,9 +102,9 @@ def with_launch_file(package, launch):
             launch = ROSLauncher(full_name, port=self.port)
             launch.start()
             if self.port in _LAUNCHER:
-                raise RosLaunchException('You are using this decorator '
-                'incorrectly. You must call use @with_launch_file only once '
-                'for any single test.')
+                raise RosLaunchException('Rosmaster port {} already in use. '
+                'You must call use @with_launch_file only once for any single '
+                'test.'.format(self.port))
 
             _LAUNCHER[self.port] = launch
 
