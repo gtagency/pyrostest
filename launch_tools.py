@@ -115,12 +115,15 @@ def with_launch_file(package, launch, **kwargs):
 
             _LAUNCHER[self.port] = launch
 
-            temp = func(self)
-
-            _LAUNCHER[self.port].stop()
-            # clean argvs from sys.argv
-            sys.argv = sys.argv[:len(new_argvs)]
-            del _LAUNCHER[self.port]
+            try:
+                temp = func(self)
+            except Exception as e:
+                raise e
+            finally:
+                _LAUNCHER[self.port].stop()
+                # clean argvs from sys.argv
+                sys.argv = sys.argv[:len(new_argvs)]
+                del _LAUNCHER[self.port]
             return temp
         return new_test
     return launcher
