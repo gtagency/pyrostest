@@ -10,6 +10,8 @@ import rosnode
 
 
 class RosLaunchException(Exception):
+    """An Exception thrown when the with_launch_file decorator is misused.
+    """
     pass
 
 
