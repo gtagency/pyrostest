@@ -99,13 +99,14 @@ Similar to `mock_pub`, `check_topic` is a context manager that allows you to
 recieve data on a topic.
 
 ```python
-with check_topic(topic, ros_message_type) as ct:
+with check_topic(topic, ros_message_type, timeout=20) as ct:
     print(ct.message)
 ```
 
 Because of how `check_topic` is implemented, ct.message may take an arbitrary
 amount of time, but will only provide a value once a value is published onto the
-monitored topic.
+monitored topic. It will block until that happens, or until `timeout` is reached.
+You can also set the optional `timeout` argument to a different value.
 
 #### Usage
 
@@ -135,7 +136,7 @@ class TestExample(RosTest):
     # step_2 subscribes to 'middle' and publishes to 'result'. Each is otherwise
     # identical to add_one above.
     def test_chain_of_events(self):
-        with mock_pub('/input', Flaot64, queue_size=0) as p:
+        with mock_pub('/input', Float64, queue_size=0) as p:
             with check_topic('/result', Float64, timeout=3) as r:
                 # uses a shorter timeout because this test should run quickly,
                 # as might be the case for realtime tests. You can also use a
