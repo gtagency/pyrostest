@@ -32,11 +32,13 @@ class ROSLauncher(roslaunch.scriptapi.ROSLaunch):
     This was found by peering into the roslaunch util source code from
     `which roslaunch`.
     """
-    def __init__(self, files, port=11311):
+    def __init__(self, files, port=11311, **kwargs):
         super(ROSLauncher, self).__init__()
         uuid = roslaunch.rlutil.get_or_generate_uuid(None, True)
+        roslaunch_strs = '\n'.join('<arg name="{}" value="{}" />'.format(k, v)
+                for k, v in kwargs.iteritems())
         self.parent = roslaunch.parent.ROSLaunchParent(uuid,
-                files, is_core=False, port=port)
+                files, is_core=False, port=port, roslaunch_strs=roslaunch_strs)
 
 
 _LAUNCHER = dict()
@@ -84,7 +86,7 @@ _LAUNCHER = dict()
 # outermost launch_node will create a master launcher and clean up after itself
 # and all child nodes launched for the test.
 
-def with_launch_file(package, launch):
+def with_launch_file(package, launch, **kwargs):
     """Decorator to source a launch file for running nodes.
 
     This should always be run first.
@@ -101,7 +103,7 @@ def with_launch_file(package, launch):
             """Wrapper around the user provided test that runs a launch file.
             """
             os.environ['ROS_MASTER_URI'] = self.rosmaster_uri
-            launch = ROSLauncher(full_name, port=self.port)
+            launch = ROSLauncher(full_name, port=self.port, **kwargs)
             launch.start()
             if self.port in _LAUNCHER:
                 raise RosLaunchException('Rosmaster port {} already in use. '
