@@ -2,6 +2,7 @@
 """
 import functools
 import os
+import sys
 import time
 
 import rosgraph
@@ -32,13 +33,11 @@ class ROSLauncher(roslaunch.scriptapi.ROSLaunch):
     This was found by peering into the roslaunch util source code from
     `which roslaunch`.
     """
-    def __init__(self, files, port=11311, **kwargs):
+    def __init__(self, files, port=11311):
         super(ROSLauncher, self).__init__()
         uuid = roslaunch.rlutil.get_or_generate_uuid(None, True)
-        roslaunch_strs = '\n'.join('<arg name="{}" value="{}" />'.format(k, v)
-                for k, v in kwargs.iteritems())
         self.parent = roslaunch.parent.ROSLaunchParent(uuid,
-                files, is_core=False, port=port, roslaunch_strs=roslaunch_strs)
+                files, is_core=False, port=port)
 
 
 _LAUNCHER = dict()
@@ -102,8 +101,12 @@ def with_launch_file(package, launch, **kwargs):
         def new_test(self):
             """Wrapper around the user provided test that runs a launch file.
             """
+            # set env variables and add argvs to sys.argv
             os.environ['ROS_MASTER_URI'] = self.rosmaster_uri
-            launch = ROSLauncher(full_name, port=self.port, **kwargs)
+            new_argvs = ['{}:={}'.format(k, v) for k, v in kwargs.iteritems()]
+            sys.argv.extend(new_argvs)
+
+            launch = ROSLauncher(full_name, port=self.port)
             launch.start()
             if self.port in _LAUNCHER:
                 raise RosLaunchException('Rosmaster port {} already in use. '
@@ -113,7 +116,10 @@ def with_launch_file(package, launch, **kwargs):
             _LAUNCHER[self.port] = launch
 
             temp = func(self)
+
             _LAUNCHER[self.port].stop()
+            # clean argvs from sys.argv
+            sys.argv = sys.argv[:len(new_argvs)]
             del _LAUNCHER[self.port]
             return temp
         return new_test
