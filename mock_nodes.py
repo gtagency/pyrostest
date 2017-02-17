@@ -7,6 +7,7 @@ import contextlib
 import cPickle as pickle
 import subprocess
 import time
+import threading
 from StringIO import StringIO
 
 import rosnode
@@ -67,9 +68,11 @@ class MockListener(object):
     """Wrapper around a node used for testing.
     """
 
-    def __init__(self, topic, msg_type):
+    def __init__(self, topic, msg_type, timeout=10):
+        self.timeout = timeout
         self.topic = topic
         self.msg_type = msg_type
+        self.killed = False
 
         # this might be fragile if not run from the ci_scripts/unittest command
         location = './tests/test_utils/listener.py'
@@ -99,17 +102,32 @@ class MockListener(object):
             # the default message of a type and then read that number of bytes
             # so that we don't encounter any issues with reading too much or
             # too little data.
-            data = self.proc.stdout.read(sio.len)
+
+            def kill_proc():
+                """Kills the proccess and sets a flag to raise an error.
+                """
+                self.proc.kill()
+                self.killed = True
+
+            timer = threading.Timer(kill_proc, self.proc.kill)
+            try:
+                data = self.proc.stdout.read(sio.len)
+            finally:
+                timer.cancel()
+
+            if self.killed:
+                raise TimeoutError('The node did not return any data within'
+                ' {} seconds'.format(self.timeout))
             msg.deserialize(data)
             self._message = msg
         return self._message
 
 
 @contextlib.contextmanager
-def check_topic(topic, rosmsg_type):
+def check_topic(topic, rosmsg_type, timeout=10):
     """Context manager that monitors a rostopic and gets a message sent to it.
     """
-    test_node = MockListener(topic, rosmsg_type)
+    test_node = MockListener(topic, rosmsg_type, timeout=timeout)
     no_ns = topic.split('/')[-1]
     while not any(nn.split('/')[-1].startswith(
         ''.join(['mock_listen_', no_ns])) for nn in rosnode.get_node_names()):
