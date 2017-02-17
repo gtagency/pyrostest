@@ -35,6 +35,19 @@ ROS requires launch files. Normally you would run something like `roslaunch
 xyz.launch`, but you can't do that when you aren't using the roslaunch command
 line tool, so this will do that for you. 
 
+This decorator also optionally takes keyword arguments, which are passed to
+`sys.argv`. This means that the following are equivalent:
+
+```python
+@with_launch_file('buzzmobile', 'simulation.launch', world='empty.world')
+def test(self):
+    ...
+```
+
+```bash
+roslaunch buzzmobile simulation.launch world:=empty.world
+```
+
 #### `launch_node`
 Most RosTests are generally structured in this manner:
 
