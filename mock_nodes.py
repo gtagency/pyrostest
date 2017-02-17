@@ -117,8 +117,8 @@ class MockListener(object):
                 timer.cancel()
 
             if self.killed:
-                raise TimeoutError('The node did not return any data within'
-                ' {} seconds'.format(self.timeout))
+                raise TimeoutError('No message published on {} within {} '
+                        'seconds'.format(self.topic, self.timeout))
             msg.deserialize(data)
             self._message = msg
         return self._message
