@@ -8,7 +8,7 @@ test = []
 
 setup(
     name='pyrostest',
-    version='0.0.2',
+    version='0.0.3',
     description='The most lit ros testing framework',
     packages=['pyrostest'],
     install_requires=required,
