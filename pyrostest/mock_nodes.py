@@ -5,6 +5,7 @@ Contains tools to send and recieve data from fake nodes and topics.
 
 import contextlib
 import cPickle as pickle
+import os
 import subprocess
 import time
 import threading
@@ -31,8 +32,8 @@ class MockPublisher(object):
         self.topic = topic
         self.msg_type = msg_type
         pub_data = pickle.dumps((topic, msg_type, queue_size))
-        # this might be fragile if not run from the ci_scripts/unittest command
-        location = './tests/test_utils/publisher.py'
+        this_dir = os.path.dirname(os.path.abspath(__file__))
+        location = os.path.join(this_dir, 'publisher.py')
         self.proc = subprocess.Popen([location, pub_data],
                 stdin=subprocess.PIPE)
 
@@ -74,8 +75,8 @@ class MockListener(object):
         self.msg_type = msg_type
         self.killed = False
 
-        # this might be fragile if not run from the ci_scripts/unittest command
-        location = './tests/test_utils/listener.py'
+        this_dir = os.path.dirname(os.path.abspath(__file__))
+        location = os.path.join(this_dir, 'listener.py')
         self.proc = subprocess.Popen([location,
             pickle.dumps((topic, msg_type))], stdout=subprocess.PIPE)
         self._message = None
