@@ -4,7 +4,6 @@ machine:
     python:
         version: 
             - 2.7
-            - 3.4
         
 
 dependencies:
