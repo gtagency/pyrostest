@@ -3,6 +3,13 @@ machine:
         - docker
     python:
         version: "2.7"
+
+checkout:
+    post:
+        - mkdir ~/catkin_ws
+        - mkdir ~/catkin_ws/src
+        - mkdir ~/catkin_ws/src/pyrostester
+        - cd ~/catkin_ws/src/pyrostester
         
 
 dependencies:
