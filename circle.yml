@@ -19,3 +19,8 @@ dependencies:
         - sudo apt-get update -qq
         - sudo apt-get install -y python-catkin-pkg python-rosdep ros-indigo-catkin ros-indigo-ros ros-indigo-roslaunch build-essential
         - pip install --upgrade pip
+
+test:
+    pre:
+        - rosinit
+        - rosdevel
