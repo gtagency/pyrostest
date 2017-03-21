@@ -26,5 +26,5 @@ dependencies:
 
 test:
     pre:
-        - rosinit
-        - rosdevel
+        - source /opt/ros/indigo/setup.sh
+          #- rosdevel
