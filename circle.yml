@@ -9,6 +9,7 @@ checkout:
         - mkdir ~/catkin_ws
         - mkdir ~/catkin_ws/src
         - mkdir ~/catkin_ws/src/pyrostester
+        - PYROS_DIR=$PWD
         - cd ~/catkin_ws/src/pyrostester
         
 
@@ -19,6 +20,9 @@ dependencies:
         - sudo apt-get update -qq
         - sudo apt-get install -y python-catkin-pkg python-rosdep ros-indigo-catkin ros-indigo-ros ros-indigo-roslaunch build-essential
         - pip install --upgrade pip
+    post:
+        - pip install -e $PYROS_DIR
+        - cp -r $PYROS_DIR/test .
 
 test:
     pre:
