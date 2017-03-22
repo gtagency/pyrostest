@@ -20,7 +20,7 @@ dependencies:
     post:
         - pip install -e ~/$CIRCLE_PROJECT_REPONAME
         - cp -r ~/$CIRCLE_PROJECT_REPONAME/test .:
-            pwd: ~/catkin_ws
+            pwd: catkin_ws/src/pyrostester
         - pip install pytest
 
 test:
@@ -29,4 +29,4 @@ test:
           #- rosdevel
     override:
         - pytest src/pyrostester/test:
-            pwd: ~/catkin_ws
+            pwd: catkin_ws
