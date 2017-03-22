@@ -9,7 +9,7 @@ checkout:
         - mkdir ~/catkin_ws
         - mkdir ~/catkin_ws/src
         - mkdir ~/catkin_ws/src/pyrostester
-        - PYROS_DIR=$PWD
+        - echo $PWD
         - cd ~/catkin_ws/src/pyrostester
         
 
