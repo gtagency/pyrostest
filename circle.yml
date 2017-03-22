@@ -29,5 +29,5 @@ test:
     override:
         - echo $PWD:
             pwd: ../catkin_ws
-        - pytest -t src/pyrostester/test:
+        - pytest src/pyrostester/test:
             pwd: ../catkin_ws
