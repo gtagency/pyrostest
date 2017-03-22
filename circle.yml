@@ -18,8 +18,6 @@ dependencies:
         - sudo apt-get install -y python-catkin-pkg python-rosdep ros-indigo-catkin ros-indigo-ros ros-indigo-roslaunch build-essential
         - pip install --upgrade pip
     post:
-        - ls:
-            pwd: /home/ubuntu
         - pip install -e /home/ubuntu/$CIRCLE_PROJECT_REPONAME
         - cp -r test /home/ubuntu/catkin_ws/src/pyrostester
         - pip install pytest
@@ -30,6 +28,6 @@ test:
           #- rosdevel
     override:
         - echo $PWD:
-            pwd: /home/ubuntu/catkin_ws
+            pwd: ../catkin_ws
         - pytest src/pyrostester/test:
-            pwd: /home/ubuntu/catkin_ws
+            pwd: ../catkin_ws
