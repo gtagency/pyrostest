@@ -21,7 +21,7 @@ dependencies:
         - ls:
             pwd: $HOME
         - pip install -e $HOME/$CIRCLE_PROJECT_REPONAME
-        - cp -r test $HOME/catkin_ws/src/pyrostester:
+        - cp -r test $HOME/catkin_ws/src/pyrostester
         - pip install pytest
 
 test:
