@@ -6,7 +6,6 @@ machine:
 
 checkout:
     post:
-        - ls
         - mkdir ~/catkin_ws
         - mkdir ~/catkin_ws/src
         - mkdir ~/catkin_ws/src/pyrostester
@@ -19,6 +18,8 @@ dependencies:
         - sudo apt-get install -y python-catkin-pkg python-rosdep ros-indigo-catkin ros-indigo-ros ros-indigo-roslaunch build-essential
         - pip install --upgrade pip
     post:
+        - ls:
+            pwd: "~"
         - pip install -e ~/$CIRCLE_PROJECT_REPONAME
         - cp -r ~/$CIRCLE_PROJECT_REPONAME/test .:
             pwd: "~catkin_ws/src/pyrostester"
