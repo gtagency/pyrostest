@@ -21,8 +21,7 @@ dependencies:
         - ls:
             pwd: $HOME
         - pip install -e $HOME/$CIRCLE_PROJECT_REPONAME
-        - cp -r $HOME/$CIRCLE_PROJECT_REPONAME/test .:
-            pwd: $HOME/catkin_ws/src/pyrostester
+        - cp -r test $HOME/catkin_ws/src/pyrostester:
         - pip install pytest
 
 test:
@@ -30,5 +29,7 @@ test:
         - source /opt/ros/indigo/setup.sh
           #- rosdevel
     override:
+        - echo $PWD:
+            pwd: $HOME/catkin_ws
         - pytest src/pyrostester/test:
             pwd: $HOME/catkin_ws
