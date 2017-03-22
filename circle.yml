@@ -6,9 +6,10 @@ machine:
 
 checkout:
     post:
-        - mkdir ~/catkin_ws
-        - mkdir ~/catkin_ws/src
-        - mkdir ~/catkin_ws/src/pyrostester
+        - ls
+        - mkdir catkin_ws
+        - mkdir catkin_ws/src
+        - mkdir catkin_ws/src/pyrostester
 
 dependencies:
     pre:
