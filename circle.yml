@@ -6,9 +6,9 @@ machine:
 
 checkout:
     post:
-        - mkdir ~/catkin_ws
-        - mkdir ~/catkin_ws/src
-        - mkdir ~/catkin_ws/src/pyrostester
+        - mkdir $HOME/catkin_ws
+        - mkdir $HOME/catkin_ws/src
+        - mkdir $HOME/catkin_ws/src/pyrostester
 
 dependencies:
     pre:
@@ -19,10 +19,10 @@ dependencies:
         - pip install --upgrade pip
     post:
         - ls:
-            pwd: "~"
-        - pip install -e ~/$CIRCLE_PROJECT_REPONAME
-        - cp -r ~/$CIRCLE_PROJECT_REPONAME/test .:
-            pwd: "~catkin_ws/src/pyrostester"
+            pwd: $HOME
+        - pip install -e $HOME/$CIRCLE_PROJECT_REPONAME
+        - cp -r $HOME/$CIRCLE_PROJECT_REPONAME/test .:
+            pwd: $HOME/catkin_ws/src/pyrostester
         - pip install pytest
 
 test:
@@ -31,4 +31,4 @@ test:
           #- rosdevel
     override:
         - pytest src/pyrostester/test:
-            pwd: "~/catkin_ws"
+            pwd: $HOME/catkin_ws
