@@ -15,7 +15,9 @@ required = [
     'psutil==5.1.3'
     ]
 
-test = []
+test = [
+    'pytest'
+    ]
 
 setup(
     name='pyrostest',
@@ -24,6 +26,7 @@ setup(
     long_description=long_description,
     packages=['pyrostest'],
     install_requires=required,
+    tests_require=test,
     url='https://github.com/gtagency/pyrostest',
     author='Joshua Morton',
     author_email='joshua.morton13@gmail.com',
