@@ -19,15 +19,16 @@ dependencies:
         - pip install --upgrade pip
     post:
         - pip install -e /home/ubuntu/$CIRCLE_PROJECT_REPONAME
-        - cp -r test /home/ubuntu/catkin_ws/src/pyrostester
+        - cp -r test /home/ubuntu/catkin_ws/src
         - pip install pytest
 
 test:
     pre:
         - source /opt/ros/indigo/setup.sh
-          #- rosdevel
-    override:
-        - echo $PWD:
+        - catkin_make:
             pwd: ../catkin_ws
+        - source devel/setup.sh:
+            pwd: ../catkin_ws
+    override:
         - pytest src/pyrostester/test:
             pwd: ../catkin_ws
