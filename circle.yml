@@ -23,12 +23,5 @@ dependencies:
         - pip install pytest
 
 test:
-    pre:
-        - source /opt/ros/indigo/setup.sh
-        - catkin_make:
-            pwd: ../catkin_ws
-        - source devel/setup.sh:
-            pwd: ../catkin_ws
     override:
-        - pytest src/pyrostester/test:
-            pwd: ../catkin_ws
+        - ./test.sh
