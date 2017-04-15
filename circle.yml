@@ -24,4 +24,4 @@ dependencies:
 
 test:
     override:
-        - sudo ./test.sh
+        - ./test.sh
