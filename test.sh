@@ -8,6 +8,7 @@ catkin_init_workspace
 sudo rosdep init
 rosdep update
 rosdep install -y --from-paths ./pyrostester --ignore-src --rosdistro=indigo
+cd ..
 catkin_make
-source ../devel/setup.sh
-pytest pyrostester/test
+source devel/setup.sh
+pytest src/pyrostester/test
