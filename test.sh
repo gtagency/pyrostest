@@ -5,8 +5,7 @@ set -e
 cd ~
 
 # Install and activate a virtualenv
-sudo apt-get -y install python-virtualenv
-sleep 1
+sudo -H pip install virtualenv 
 python -m virtualenv .
 source bin/activate
 pip install --upgrade pip
