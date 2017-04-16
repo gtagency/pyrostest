@@ -8,7 +8,6 @@ checkout:
     post:
         - mkdir /home/ubuntu/catkin_ws
         - mkdir /home/ubuntu/catkin_ws/src
-        - mkdir /home/ubuntu/catkin_ws/src/pyrostester
 
 dependencies:
     pre:
