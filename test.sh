@@ -2,11 +2,11 @@
 
 set -e
 
-cd ~/catkin_ws
+cd ~
 
 # Install and activate a virtualenv
 sudo apt-get -y install python-virtualenv
-python -m virtualenv
+python -m virtualenv .
 source bin/activate
 pip install --upgrade pip
 
@@ -20,7 +20,7 @@ sudo apt-get install -y python-catkin-pkg python-rosdep ros-indigo-catkin ros-in
 pip install -e ~/$CIRCLE_PROJECT_REPONAME
 
 # And copy it into the catkin_ws directory
-cp -r test/pyrostest /home/ubuntu/catkin_ws/src
+cp -r ~/pyrostest/test/pyrostest ~/catkin_ws/src
 
 # And install the testing tool
 pip install pytest
