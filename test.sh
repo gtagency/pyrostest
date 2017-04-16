@@ -12,4 +12,4 @@ rosdep install -y --from-paths ./test/pyrostest --ignore-src --rosdistro=indigo
 cd ..
 catkin_make
 source devel/setup.sh
-pytest src/test/pyrostest/test
+pytest src/test/pyrostest
