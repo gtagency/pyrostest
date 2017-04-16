@@ -5,9 +5,6 @@ set -e
 cd ~
 
 # Install and activate a virtualenv
-sudo apt-get -y install python-virtualenv 
-python2 -m virtualenv .
-source bin/activate
 pip install --upgrade pip
 
 # install ros
