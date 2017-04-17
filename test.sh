@@ -11,7 +11,7 @@ pip install --upgrade pip
 
 # install ros and some dependencies
 sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
-sudo apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net --recv-key 0xB01FA116
+sudo apt-key adv --keyserver pgp.mit.edu --recv-key 421C365BD9FF1F717815A3895523BAEEB01FA116
 sudo apt-get update -qq
 sudo apt-get install -y python-catkin-pkg python-rosdep ros-indigo-catkin ros-indigo-ros ros-indigo-roslaunch build-essential
 
