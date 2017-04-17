@@ -30,7 +30,11 @@ rosdep update
 
 pip install rospkg
 pip install catkin-pkg
-pip install ros-indigo-rosnode
+# pip install ros-indigo-rosnode
+
+# keyserver problems lead me to this.
+wget http://packages.ros.org/ros/ubuntu/pool/main/r/ros-indigo-rosnode/ros-indigo-rosnode_1.11.21-0trusty-20170313-095955-0700_amd64.deb
+sudo dpkg -i ros-indigo-rosnode_1.11.21-0trusty-20170313-095955-0700_amd64.deb
 
 # Build the project and install rosdeps
 cd ~/catkin_ws/src
