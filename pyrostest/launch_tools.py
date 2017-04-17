@@ -148,6 +148,8 @@ def launch_node(package, name, namespace=None):
                     env_args=env.iteritems())
             is_master = False
             if self.port not in _LAUNCHER:
+                # set env variables and add argvs to sys.argv
+                os.environ['ROS_MASTER_URI'] = self.rosmaster_uri
                 launch = ROSLauncher([], port=self.port)
                 launch.start()
                 _LAUNCHER[self.port] = launch

@@ -10,7 +10,7 @@ def add_one_cb(val):
 
 def add_one():
     rospy.init_node('adder', anonymous=True)
-    rospy.Subscriber('subber', Int32, add_one_cb)
+    rospy.Subscriber('/subber', Int32, add_one_cb)
     rospy.spin()
 
 if __name__ == '__main__':

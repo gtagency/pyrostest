@@ -21,7 +21,7 @@ def publish(topic, msg_type):
     """
     rospy.init_node('mock_publish_'+topic.split('/')[-1], anonymous=True,
             disable_signals=True)
-    pub = rospy.Publisher(topic, msg_type, QUEUE_SIZE)
+    pub = rospy.Publisher(topic, msg_type, queue_size=QUEUE_SIZE)
     msg = msg_type()
     sio = StringIO()
     msg.serialize(sio)
