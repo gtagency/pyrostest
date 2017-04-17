@@ -13,3 +13,5 @@ def add_one():
     rospy.Subscriber('subber', Int32, add_one_cb)
     rospy.spin()
 
+if __name__ == '__main__':
+    add_one()
