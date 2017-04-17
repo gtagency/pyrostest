@@ -4,8 +4,6 @@ set -e
 
 cd ~
 
-# Upgrade pip
-/usr/bin/python -m pip install --upgrade pip
 
 # install ros and some dependencies
 sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
