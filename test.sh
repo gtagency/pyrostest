@@ -5,22 +5,22 @@ set -e
 cd ~
 
 # Upgrade pip
-python -m pip install --upgrade pip
+/usr/bin/python -m pip install --upgrade pip
 
 # install ros and some dependencies
 sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
 sudo apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net --recv-key 0xB01FA116
 sudo apt-get update -qq
-sudo -H apt-get install -y python-catkin-pkg python-rosdep ros-indigo-catkin ros-indigo-ros ros-indigo-roslaunch build-essential
+sudo apt-get install -y python-catkin-pkg python-rosdep ros-indigo-catkin ros-indigo-ros ros-indigo-roslaunch build-essential
 
 # Install our project
-pip install -e ~/$CIRCLE_PROJECT_REPONAME
+/usr/bin/python -m pip install -e ~/$CIRCLE_PROJECT_REPONAME
 
 # And copy it into the catkin_ws directory
 cp -r ~/pyrostest/test/pyrostest ~/catkin_ws/src
 
 # And install the testing tool
-python -m pip install pytest
+/usr/bin/python -m pip install pytest
 
 # Install and update rosdep
 sudo rosdep init
@@ -34,4 +34,4 @@ rosdep install -y --from-paths ./pyrostest --ignore-src --rosdistro=indigo
 cd ~/catkin_ws
 catkin_make
 source devel/setup.bash
-python -m pytest src/pyrostest
+/usr/bin/python -m pytest src/pyrostest
