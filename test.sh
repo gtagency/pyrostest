@@ -13,7 +13,7 @@ pip install --upgrade pip
 sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
 sudo apt-key adv --keyserver hkp://pgp.mit.edu:80 --recv-key 421C365BD9FF1F717815A3895523BAEEB01FA116
 sudo apt-get update -qq
-sudo apt-get install -y python-catkin-pkg python-rosdep ros-indigo-catkin ros-indigo-ros ros-indigo-roslaunch build-essential
+sudo apt-get install -y python-catkin-pkg python-rosdep ros-indigo-catkin ros-indigo-ros ros-indigo-roslaunch build-essential ros-indigo-rosnode
 
 # Install our project
 pip install -e ~/$CIRCLE_PROJECT_REPONAME
@@ -30,11 +30,6 @@ rosdep update
 
 pip install rospkg
 pip install catkin-pkg
-# pip install ros-indigo-rosnode
-
-# keyserver problems lead me to this.
-wget http://packages.ros.org/ros/ubuntu/pool/main/r/ros-indigo-rosnode/ros-indigo-rosnode_1.11.21-0trusty-20170313-095955-0700_amd64.deb
-sudo dpkg -i ros-indigo-rosnode_1.11.21-0trusty-20170313-095955-0700_amd64.deb
 
 # Build the project and install rosdeps
 cd ~/catkin_ws/src
