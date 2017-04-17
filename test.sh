@@ -29,6 +29,7 @@ sudo rosdep init
 rosdep update
 
 pip install rospkg
+pip install catkin-pkg
 
 # Build the project and install rosdeps
 cd ~/catkin_ws/src
