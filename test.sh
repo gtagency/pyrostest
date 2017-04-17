@@ -28,6 +28,8 @@ pip install pytest
 sudo rosdep init
 rosdep update
 
+pip install rospkg
+
 # Build the project and install rosdeps
 cd ~/catkin_ws/src
 source /opt/ros/indigo/setup.bash
