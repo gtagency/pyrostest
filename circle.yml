@@ -10,4 +10,4 @@ checkout:
 
 test:
     override:
-        - ./test.sh
+        - deactivate && ./test.sh
