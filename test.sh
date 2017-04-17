@@ -31,7 +31,6 @@ rosdep update
 # Build the project and install rosdeps
 cd ~/catkin_ws/src
 source /opt/ros/indigo/setup.bash
-catkin_init_workspace
 rosdep install -y --from-paths ./pyrostest --ignore-src --rosdistro=indigo
 cd ~/catkin_ws
 catkin_make
