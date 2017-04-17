@@ -4,8 +4,9 @@ set -e
 
 cd ~
 
-# Install and activate a virtualenv
-pip install --upgrade pip
+# Escape virtualenv and upgrade pip
+deactivate
+python -m pip install --upgrade pip
 
 # install ros
 sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
@@ -20,7 +21,7 @@ pip install -e ~/$CIRCLE_PROJECT_REPONAME
 cp -r ~/pyrostest/test/pyrostest ~/catkin_ws/src
 
 # And install the testing tool
-pip install pytest
+python -m pip install pytest
 
 # Install and update rosdep
 sudo rosdep init
@@ -34,4 +35,4 @@ rosdep install -y --from-paths ./pyrostest --ignore-src --rosdistro=indigo
 cd ~/catkin_ws
 catkin_make
 source devel/setup.bash
-pytest src/pyrostest
+python -m pytest src/pyrostest
