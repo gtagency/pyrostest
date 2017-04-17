@@ -32,4 +32,4 @@ rosdep install -y --from-paths ./pyrostest --ignore-src --rosdistro=indigo
 cd ~/catkin_ws
 catkin_make
 source devel/setup.bash
-/usr/bin/python -m pytest src/pyrostest
+python -m pytest src/pyrostest
