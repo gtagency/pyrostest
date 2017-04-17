@@ -4,7 +4,7 @@ set -e
 
 cd ~
 
-python virtualenv .
+python -m virtualenv .
 source bin/activate
 
 # install ros and some dependencies
