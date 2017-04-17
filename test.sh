@@ -12,13 +12,13 @@ sudo apt-get update -qq
 sudo apt-get install -y python-catkin-pkg python-rosdep ros-indigo-catkin ros-indigo-ros ros-indigo-roslaunch build-essential
 
 # Install our project
-/usr/bin/python -m pip install -e ~/$CIRCLE_PROJECT_REPONAME
+python -m pip install -e ~/$CIRCLE_PROJECT_REPONAME
 
 # And copy it into the catkin_ws directory
 cp -r ~/pyrostest/test/pyrostest ~/catkin_ws/src
 
 # And install the testing tool
-/usr/bin/python -m pip install pytest
+python -m pip install pytest
 
 # Install and update rosdep
 sudo rosdep init
