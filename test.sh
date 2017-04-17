@@ -30,6 +30,7 @@ rosdep update
 
 pip install rospkg
 pip install catkin-pkg
+pip install ros-indigo-rosnode
 
 # Build the project and install rosdeps
 cd ~/catkin_ws/src
