@@ -4,11 +4,10 @@ set -e
 
 cd ~
 
-# Escape virtualenv and upgrade pip
-deactivate
+# Upgrade pip
 python -m pip install --upgrade pip
 
-# install ros
+# install ros and some dependencies
 sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
 sudo apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net --recv-key 0xB01FA116
 sudo apt-get update -qq
