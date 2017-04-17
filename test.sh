@@ -4,8 +4,10 @@ set -e
 
 cd ~
 
+# Enter a virtualenv we control!
 python -m virtualenv .
 source bin/activate
+pip install --upgrade pip
 
 # install ros and some dependencies
 sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
@@ -14,13 +16,13 @@ sudo apt-get update -qq
 sudo apt-get install -y python-catkin-pkg python-rosdep ros-indigo-catkin ros-indigo-ros ros-indigo-roslaunch build-essential
 
 # Install our project
-python -m pip install -e ~/$CIRCLE_PROJECT_REPONAME
+pip install -e ~/$CIRCLE_PROJECT_REPONAME
 
 # And copy it into the catkin_ws directory
 cp -r ~/pyrostest/test/pyrostest ~/catkin_ws/src
 
 # And install the testing tool
-python -m pip install pytest
+pip install pytest
 
 # Install and update rosdep
 sudo rosdep init
@@ -34,4 +36,4 @@ rosdep install -y --from-paths ./pyrostest --ignore-src --rosdistro=indigo
 cd ~/catkin_ws
 catkin_make
 source devel/setup.bash
-python -m pytest src/pyrostest
+pytest src/pyrostest
