@@ -135,8 +135,8 @@ def check_topic(topic, rosmsg_type, timeout=10):
         ''.join(['mock_listen_', no_ns])) for nn in rosnode.get_node_names()):
         time.sleep(.1)
 
-
     try:
         yield test_node
     finally:
         test_node.kill()
+
