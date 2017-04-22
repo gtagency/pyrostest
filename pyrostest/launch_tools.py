@@ -143,9 +143,6 @@ def launch_node(package, name, namespace=None):
         def new_test(self):
             """Wrapper around the user-provided test that runs a ros node.
             """
-            env = {'ROS_MASTER_URI': self.rosmaster_uri}
-            node = roslaunch.core.Node(package, name, namespace=namespace,
-                    env_args=env.iteritems())
             is_master = False
             if self.port not in _LAUNCHER:
                 # set env variables and add argvs to sys.argv
@@ -156,6 +153,10 @@ def launch_node(package, name, namespace=None):
                 is_master = True
             else:
                 launch = _LAUNCHER[self.port]
+
+            env = {'ROS_MASTER_URI': self.rosmaster_uri}
+            node = roslaunch.core.Node(package, name, namespace=namespace,
+                    env_args=env.iteritems())
 
             process = launch.launch(node)
             # Beware this is a bit of a hack, and will currently not work if we
