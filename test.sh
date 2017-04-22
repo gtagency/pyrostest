@@ -15,10 +15,10 @@ sudo apt-key adv --keyserver hkp://pgp.mit.edu:80 --recv-key 421C365BD9FF1F71781
 sudo apt-get update -qq
 sudo apt-get install -y python-catkin-pkg python-rosdep ros-indigo-catkin ros-indigo-ros ros-indigo-roslaunch build-essential ros-indigo-rosnode
 
-# Install our project
+# Install our project globally
 pip install -e ~/$CIRCLE_PROJECT_REPONAME
 
-# And copy it into the catkin_ws directory
+# Copy the rospackage to the catkin workspace
 cp -r ~/pyrostest/test/pyrostest ~/catkin_ws/src
 
 # And install the testing tool
