@@ -5,8 +5,8 @@ set -e
 cd ~
 
 # Enter a virtualenv we control!
-python -m virtualenv .
-source bin/activate
+python -m virtualenv ./.venv
+source .venv/bin/activate
 pip install --upgrade pip
 
 # install ros and some dependencies
