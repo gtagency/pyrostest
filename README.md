@@ -1,7 +1,7 @@
-pyrostest
+:fire: pyrostest :fire:
 =========
 
-The most lit ros testing framework.
+The most :fire: lit :fire: ros testing framework.
 
 Pyrostest is a (more) pythonic framework for writing ros tests.
 
