@@ -1,6 +1,9 @@
 """Utilities that deal with creating fake rosnodes for testing.
 
-Contains tools to send and recieve data from fake nodes and topics.
+Contains tools to send and recieve data from fake nodes and topics. This is
+needed because ROS doesn't allow you to run multiple nodes from the same
+process, so instead we have to set up a background process and communicate with
+it over the system.
 """
 
 import contextlib
@@ -10,8 +13,11 @@ import subprocess
 import time
 import threading
 from StringIO import StringIO
+import unittest
 
 import rosnode
+
+import pyrostest.rostest_utils
 
 
 class TimeoutError(Exception):
@@ -21,9 +27,10 @@ class TimeoutError(Exception):
 
 
 class NoMessage(Exception):
-    """Exception for a lack of message in a Node.
+    """Exception for a lack of message from a Node.
     """
     pass
+
 
 class MockPublisher(object):
     """Mock of a node object for testing.
@@ -32,6 +39,8 @@ class MockPublisher(object):
         self.topic = topic
         self.msg_type = msg_type
         pub_data = pickle.dumps((topic, msg_type, queue_size))
+        # dynamically looks up the location of the publisher.py file in
+        # relation to this file (they should be in the same dir)
         this_dir = os.path.dirname(os.path.abspath(__file__))
         location = os.path.join(this_dir, 'publisher.py')
         self.proc = subprocess.Popen([location, pub_data],
@@ -50,22 +59,7 @@ class MockPublisher(object):
         self.proc.kill()
 
 
-@contextlib.contextmanager
-def mock_pub(topic, rosmsg_type, queue_size=1):
-    """Mocks a node and cleans it up when done.
-    """
-    pub = MockPublisher(topic, rosmsg_type, queue_size)
-    no_ns = topic.split('/')[-1]
-    while not any(nn.split('/')[-1].startswith(
-        ''.join(['mock_publish_', no_ns])) for nn in rosnode.get_node_names()):
-        time.sleep(.1)
-    try:
-        yield pub
-    finally:
-        pub.kill()
-
-
-class MockListener(object):
+class MockSubscriber(object):
     """Wrapper around a node used for testing.
     """
 
@@ -125,18 +119,43 @@ class MockListener(object):
         return self._message
 
 
-@contextlib.contextmanager
-def check_topic(topic, rosmsg_type, timeout=10):
-    """Context manager that monitors a rostopic and gets a message sent to it.
-    """
-    test_node = MockListener(topic, rosmsg_type, timeout=timeout)
-    no_ns = topic.split('/')[-1]
-    while not any(nn.split('/')[-1].startswith(
-        ''.join(['mock_listen_', no_ns])) for nn in rosnode.get_node_names()):
-        time.sleep(.1)
 
-    try:
-        yield test_node
-    finally:
-        test_node.kill()
+class RosTest(unittest.TestCase):
+    """A subclass of TestCase that exposes some additional ros-related attrs.
+
+    self.port is the port this instance will run on.
+    self.rosmaster_uri is equivalent to the ROS_MASTER_URI environmental var
+    """
+    __metaclass__ = pyrostest.rostest_utils.RosTestMeta
+
+    @contextlib.contextmanager
+    def check_topic(self, topic, rosmsg_type, timeout=10):
+        """Context manager that monitors a rostopic and gets a message sent to
+        it.
+        """
+        test_node = MockSubscriber(topic, rosmsg_type, timeout=timeout)
+        no_ns = topic.split('/')[-1]
+        while not any(nn.split('/')[-1].startswith( ''.join(['mock_listen_',
+            no_ns])) for nn in rosnode.get_node_names()):
+            time.sleep(.1)
+
+        try:
+            yield test_node
+        finally:
+            test_node.kill()
+
+        
+    @contextlib.contextmanager
+    def mock_pub(self, topic, rosmsg_type, queue_size=1):
+        """Mocks a node and cleans it up when done.
+        """
+        pub = MockPublisher(topic, rosmsg_type, queue_size)
+        no_ns = topic.split('/')[-1]
+        while not any(nn.split('/')[-1].startswith( ''.join(['mock_publish_',
+            no_ns])) for nn in rosnode.get_node_names()):
+            time.sleep(.1)
+        try:
+            yield pub
+        finally:
+            pub.kill()
 

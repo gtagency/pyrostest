@@ -87,11 +87,3 @@ class RosTestMeta(type):
         dct['tearDown'].__name__ = 'tearDown'
         return super(RosTestMeta, mcs).__new__(mcs, name, bases, dct)
 
-
-class RosTest(unittest.TestCase):
-    """A subclass of TestCase that exposes some additional ros-related attrs.
-
-    self.port is the port this instance will run on.
-    self.rosmaster_uri is equivalent to the ROS_MASTER_URI environmental var
-    """
-    __metaclass__ = RosTestMeta
