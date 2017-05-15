@@ -15,8 +15,6 @@ import threading
 from StringIO import StringIO
 import unittest
 
-import rosnode
-
 import pyrostest.rostest_utils
 
 
@@ -49,9 +47,8 @@ class MockPublisher(object):
     def send(self, value):
         """Sends data to be publoshed to the mocked topic.
         """
+        time.sleep(.5)
         value.serialize(self.proc.stdin)
-        # Just long enough to prevent out of order
-        time.sleep(.2)
 
     def kill(self):
         """Kills the publisher ros node process.
@@ -63,14 +60,14 @@ class MockSubscriber(object):
     """Wrapper around a node used for testing.
     """
 
-    def __init__(self, topic, msg_type, timeout=10):
+    def __init__(self, topic, msg_type, timeout):
         self.timeout = timeout
         self.topic = topic
         self.msg_type = msg_type
         self.killed = False
 
         this_dir = os.path.dirname(os.path.abspath(__file__))
-        location = os.path.join(this_dir, 'listener.py')
+        location = os.path.join(this_dir, 'subscriber.py')
         self.proc = subprocess.Popen([location,
             pickle.dumps((topic, msg_type))], stdout=subprocess.PIPE)
         self._message = None
@@ -87,7 +84,7 @@ class MockSubscriber(object):
 
         Makes sure you've actually recieved a message before providing one.
         """
-        if  not self._message:
+        if not self._message:
             msg = self.msg_type()
             sio = StringIO()
             msg.serialize(sio)
@@ -112,8 +109,9 @@ class MockSubscriber(object):
                 timer.cancel()
 
             if self.killed:
-                raise TimeoutError('No message published on {} within {} '
-                        'seconds'.format(self.topic, self.timeout))
+                raise TimeoutError('No message published to {} within {} '
+                        'seconds. Needed {} bytes, got {}.'.format(self.topic,
+                            self.timeout, sio.len, len(data)))
             msg.deserialize(data)
             self._message = msg
         return self._message
@@ -135,8 +133,9 @@ class RosTest(unittest.TestCase):
         """
         test_node = MockSubscriber(topic, rosmsg_type, timeout=timeout)
         no_ns = topic.split('/')[-1]
-        while not any(nn.split('/')[-1].startswith( ''.join(['mock_listen_',
-            no_ns])) for nn in rosnode.get_node_names()):
+        while not any(nn.split('/')[-1].startswith( ''.join(['mock_subscribe_',
+            no_ns])) for nn in
+            pyrostest.rostest_utils.my_get_node_names(uri=self.rosmaster_uri)):
             time.sleep(.1)
 
         try:
@@ -152,7 +151,8 @@ class RosTest(unittest.TestCase):
         pub = MockPublisher(topic, rosmsg_type, queue_size)
         no_ns = topic.split('/')[-1]
         while not any(nn.split('/')[-1].startswith( ''.join(['mock_publish_',
-            no_ns])) for nn in rosnode.get_node_names()):
+            no_ns])) for nn in
+            pyrostest.rostest_utils.my_get_node_names(uri=self.rosmaster_uri)):
             time.sleep(.1)
         try:
             yield pub

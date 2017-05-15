@@ -5,25 +5,15 @@ import os
 import sys
 import time
 
-import rosgraph
 import roslaunch
-import rosnode
 
+import pyrostest.rostest_utils
 
 class RosLaunchException(Exception):
     """An Exception thrown when the with_launch_file decorator is misused.
     """
     pass
 
-
-def my_get_node_names(namespace=None, uri='http://localhost:11311'):
-    """Monkeypatches get_node_names with a non-default ROS_MASTER_URI.
-    """
-    old_master = rosgraph.Master
-    rosgraph.Master = functools.partial(rosgraph.Master, master_uri=uri)
-    nodenames = rosnode.get_node_names(namespace=namespace)
-    rosgraph.Master = old_master
-    return nodenames
 
 
 class ROSLauncher(roslaunch.scriptapi.ROSLaunch):
@@ -162,7 +152,8 @@ def launch_node(package, name, namespace=None):
             # Beware this is a bit of a hack, and will currently not work if we
             # want to run more than 1 node with the same name.
             while not any(nn.split('/')[-1].startswith(name.replace('.', '_'))
-                    for nn in my_get_node_names(uri=self.rosmaster_uri)):
+                    for nn in
+                    pyrostest.rostest_utils.my_get_node_names(uri=self.rosmaster_uri)):
                 time.sleep(.1)
             try:
                 temp = func(self)
