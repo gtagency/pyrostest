@@ -14,16 +14,17 @@ import sys
 import rospy
 
 
-def listen(topic, msg_type):
+
+def subscribe(topic, msg_type):
     """A function to isolate some of the subscriber logic.
     """
-    rospy.init_node('mock_listen_'+topic.split('/')[-1], anonymous=True,
+    rospy.init_node('mock_subscribe_'+topic.split('/')[-1], anonymous=True,
             disable_signals=True)
     def listener_cb(message):
         """A default callback for our subscriber.
         """
         message.serialize(sys.stdout)
-        rospy.signal_shutdown('message sent')
+
     rospy.Subscriber(topic, msg_type, listener_cb)
     rospy.spin()
 
@@ -31,4 +32,4 @@ def listen(topic, msg_type):
 
 if __name__ == '__main__':
     ROSTOPIC, ROSMSG_TYPE = pickle.loads(sys.argv[1])
-    listen(ROSTOPIC, ROSMSG_TYPE)
+    subscribe(ROSTOPIC, ROSMSG_TYPE)

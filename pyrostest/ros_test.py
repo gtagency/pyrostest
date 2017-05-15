@@ -51,7 +51,7 @@ class MockPublisher(object):
         """
         value.serialize(self.proc.stdin)
         # Just long enough to prevent out of order
-        time.sleep(.2)
+        time.sleep(.5)
 
     def kill(self):
         """Kills the publisher ros node process.
@@ -63,14 +63,14 @@ class MockSubscriber(object):
     """Wrapper around a node used for testing.
     """
 
-    def __init__(self, topic, msg_type, timeout=10):
+    def __init__(self, topic, msg_type, timeout):
         self.timeout = timeout
         self.topic = topic
         self.msg_type = msg_type
         self.killed = False
 
         this_dir = os.path.dirname(os.path.abspath(__file__))
-        location = os.path.join(this_dir, 'listener.py')
+        location = os.path.join(this_dir, 'subscriber.py')
         self.proc = subprocess.Popen([location,
             pickle.dumps((topic, msg_type))], stdout=subprocess.PIPE)
         self._message = None
@@ -129,13 +129,13 @@ class RosTest(unittest.TestCase):
     __metaclass__ = pyrostest.rostest_utils.RosTestMeta
 
     @contextlib.contextmanager
-    def check_topic(self, topic, rosmsg_type, timeout=10):
+    def check_topic(self, topic, rosmsg_type, timeout=15):
         """Context manager that monitors a rostopic and gets a message sent to
         it.
         """
         test_node = MockSubscriber(topic, rosmsg_type, timeout=timeout)
         no_ns = topic.split('/')[-1]
-        while not any(nn.split('/')[-1].startswith( ''.join(['mock_listen_',
+        while not any(nn.split('/')[-1].startswith( ''.join(['mock_subscribe_',
             no_ns])) for nn in rosnode.get_node_names()):
             time.sleep(.1)
 
