@@ -2,13 +2,25 @@
 """
 
 import os
+import functools
 import random
 import socket
 import subprocess
 import time
-import unittest
 
 import psutil
+import rosgraph
+import rosnode
+
+
+def my_get_node_names(namespace=None, uri='http://localhost:11311'):
+    """Monkeypatches get_node_names with a non-default ROS_MASTER_URI.
+    """
+    old_master = rosgraph.Master
+    rosgraph.Master = functools.partial(rosgraph.Master, master_uri=uri)
+    nodenames = rosnode.get_node_names(namespace=namespace)
+    rosgraph.Master = old_master
+    return nodenames
 
 
 def rand_port():
