@@ -24,6 +24,7 @@ def subscribe(topic, msg_type):
         """A default callback for our subscriber.
         """
         message.serialize(sys.stdout)
+        rospy.signal_shutdown('message sent')
 
     rospy.Subscriber(topic, msg_type, listener_cb)
     rospy.spin()
