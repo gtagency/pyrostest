@@ -117,6 +117,15 @@ class MockSubscriber(object):
         return self._message
 
 
+def _await_node(topic, prefix, rosmaster_uri):
+    """Helper to block until a node is availible in ROS.
+    """
+    no_ns = topic.split('/')[-1]
+    while not any(nn.split('/')[-1].startswith(''.join([prefix, '_', no_ns]))
+            for nn in
+            pyrostest.rostest_utils.my_get_node_names(uri=rosmaster_uri)):
+        time.sleep(.1)
+
 
 class RosTest(unittest.TestCase):
     """A subclass of TestCase that exposes some additional ros-related attrs.
@@ -132,28 +141,19 @@ class RosTest(unittest.TestCase):
         it.
         """
         test_node = MockSubscriber(topic, rosmsg_type, timeout=timeout)
-        no_ns = topic.split('/')[-1]
-        while not any(nn.split('/')[-1].startswith( ''.join(['mock_subscribe_',
-            no_ns])) for nn in
-            pyrostest.rostest_utils.my_get_node_names(uri=self.rosmaster_uri)):
-            time.sleep(.1)
+        _await_node(topic, 'mock_subscribe', self.rosmaster_uri)
 
         try:
             yield test_node
         finally:
             test_node.kill()
 
-        
     @contextlib.contextmanager
     def mock_pub(self, topic, rosmsg_type, queue_size=1):
         """Mocks a node and cleans it up when done.
         """
         pub = MockPublisher(topic, rosmsg_type, queue_size)
-        no_ns = topic.split('/')[-1]
-        while not any(nn.split('/')[-1].startswith( ''.join(['mock_publish_',
-            no_ns])) for nn in
-            pyrostest.rostest_utils.my_get_node_names(uri=self.rosmaster_uri)):
-            time.sleep(.1)
+        _await_node(topic, 'mock_publish', self.rosmaster_uri)
         try:
             yield pub
         finally:
