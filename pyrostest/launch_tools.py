@@ -83,10 +83,15 @@ def with_launch_file(package, launch, **kwargs):
     This and launch nodes work together gracefully, as long as you follow the
     guidelines outlined in `buzzmobile/tests/test_utils/launch_tools.py`.
     """
-    full_name = roslaunch.rlutil.resolve_launch_arguments([package, launch])
     def launcher(func):
         """Decorator function created by the decorator-gen.
         """
+        
+        # This should be in launcher and not outside because moving it outside
+        # causes errors at test collection time instead of test run time, at
+        # the cost of a minor decrease in performance.
+        full_name = roslaunch.rlutil.resolve_launch_arguments([package,
+            launch])
         @functools.wraps(func)
         def new_test(self):
             """Wrapper around the user provided test that runs a launch file.
