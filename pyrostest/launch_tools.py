@@ -87,28 +87,28 @@ def with_launch_file(package, launch, **kwargs):
         """Decorator function created by the decorator-gen.
         """
         
-        # This should be in launcher and not outside because moving it outside
-        # causes errors at test collection time instead of test run time, at
-        # the cost of a minor decrease in performance.
-        full_name = roslaunch.rlutil.resolve_launch_arguments([package,
-            launch])
         @functools.wraps(func)
         def new_test(self):
             """Wrapper around the user provided test that runs a launch file.
             """
+            # This should be in new_test and not outside because moving it
+            # outside causes errors at test collection time instead of test run
+            # time, at the cost of a minor decrease in performance.
+            full_name = roslaunch.rlutil.resolve_launch_arguments([package,
+                launch])
             # set env variables and add argvs to sys.argv
             os.environ['ROS_MASTER_URI'] = self.rosmaster_uri
             new_argvs = ['{}:={}'.format(k, v) for k, v in kwargs.iteritems()]
             sys.argv.extend(new_argvs)
 
-            launch = ROSLauncher(full_name, port=self.port)
-            launch.start()
+            ros_launcher = ROSLauncher(full_name, port=self.port)
+            ros_launcher.start()
             if self.port in _LAUNCHER:
                 raise RosLaunchException('Rosmaster port {} already in use. '
                 'You must call use @with_launch_file only once for any single '
                 'test, and before any @launch_node calls.'.format(self.port))
 
-            _LAUNCHER[self.port] = launch
+            _LAUNCHER[self.port] = ros_launcher
 
             try:
                 temp = func(self)
