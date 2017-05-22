@@ -6,6 +6,10 @@ class TestSpinUp(pyrostest.RosTest):
     def noop(self):
         pass
 
+    @pyrostest.launch_node('pyrostest', 'add_one.py')
+    def launches_node(self):
+        pass
+
 class FailureCases(pyrostest.RosTest):
     @pytest.mark.xfail(strict=True)
     @pyrostest.launch_node('this_isnt_a_project', 'add_one.py')
@@ -28,3 +32,4 @@ class FailureCases(pyrostest.RosTest):
     @pyrostest.with_launch_file('not_a_package', 'exists')
     def no_launch_package(self):
         pass
+
