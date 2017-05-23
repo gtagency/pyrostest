@@ -94,8 +94,13 @@ def with_launch_file(package, launch, **kwargs):
             # This should be in new_test and not outside because moving it
             # outside causes errors at test collection time instead of test run
             # time, at the cost of a minor decrease in performance.
-            full_name = roslaunch.rlutil.resolve_launch_arguments([package,
-                launch])
+            try:
+                full_name = roslaunch.rlutil.resolve_launch_arguments([package,
+                    launch])
+            except roslaunch.core.RLException:
+                raise Exception('The package {}/{} does not exist. Make sure'
+                        'the name is correct and you have initialized your ROS'
+                        'environment'.format(package, launch))
             # set env variables and add argvs to sys.argv
             os.environ['ROS_MASTER_URI'] = self.rosmaster_uri
             new_argvs = ['{}:={}'.format(k, v) for k, v in kwargs.iteritems()]
