@@ -49,3 +49,15 @@ class TestFailureCases(pyrostest.RosTest):
     def test_no_launch_package(self):
         pass
 
+    @pytest.mark.xfail(strict=True)
+    @pyrostest.launch_node('pyrostest', 'pub_foo.py')
+    @pyrostest.with_launch_file('pyrostest', 'launch.launch')
+    def test_bad_launch_order(self):
+        pass
+
+
+    @pytest.mark.xfail(strict=True)
+    @pyrostest.with_launch_file('pyrostest', 'launch.launch')
+    @pyrostest.with_launch_file('pyrostest', 'launch.launch')
+    def test_multiple_launch(self):
+        pass
