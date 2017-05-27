@@ -135,6 +135,10 @@ class RosTest(unittest.TestCase):
     """
     __metaclass__ = pyrostest.rostest_utils.RosTestMeta
 
+    def __init__(self, *args, **kwargs):
+        super(RosTest, self).__init__(*args, **kwargs)
+        self.LAUNCHER = dict()
+
     @contextlib.contextmanager
     def check_topic(self, topic, rosmsg_type, timeout=10):
         """Context manager that monitors a rostopic and gets a message sent to

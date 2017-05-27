@@ -16,9 +16,9 @@ class TestAddOne(pyrostest.RosTest):
             with self.check_topic('/pyrostest/add_one', Int32) as out:
                 sub.send(Int32(5))
                 assert out.message.data == 6
-            with self.check_topic('/pyrostest/add_one', Int32) as out:
+            with self.check_topic('/pyrostest/add_one', Int32) as out2:
                 sub.send(Int32(7))
-                assert out.message.data == 8
+                assert out2.message.data == 8
 
 
 class TestPubFoo(pyrostest.RosTest):
