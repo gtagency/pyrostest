@@ -23,7 +23,7 @@ class TestAddOne(pyrostest.RosTest):
 
 class TestPubFoo(pyrostest.RosTest):
     @pyrostest.with_launch_file('pyrostest', 'launch.launch')
-    @pyrostest.launch_node('pyrostest', 'add_one.py')
+    @pyrostest.launch_node('pyrostest', 'pub_foo.py')
     def test_foo_node(self):
         with self.check_topic('/pub_val', Int32) as out:
             assert out.message.data == 7
@@ -31,8 +31,8 @@ class TestPubFoo(pyrostest.RosTest):
 
 class TestSequence(pyrostest.RosTest):
     @pyrostest.with_launch_file('pyrostest', 'launch.launch')
-    @pyrostest.launch_node('pyrostest', 'add_one.py')
     @pyrostest.launch_node('pyrostest', 'pub_foo.py')
+    @pyrostest.launch_node('pyrostest', 'add_one.py')
     def test_nodes_in_sequence(self):
         with self.check_topic('/pyrostest/add_one', Int32) as out:
             assert out.message.data == 8
