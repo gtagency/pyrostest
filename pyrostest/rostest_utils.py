@@ -89,8 +89,12 @@ class RosTestMeta(type):
             self.roscore.wait()
             self.roscore = None
             for child in children:
-                child.terminate()
-                child.wait()
+                try:
+                    child.terminate()
+                    child.wait()
+                except psutil.NoSuchProcess:
+                    # its possible the process has already been killed
+                    pass
 
 
         dct['setUp'] = new_setup

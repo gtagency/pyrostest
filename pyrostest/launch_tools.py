@@ -30,8 +30,6 @@ class ROSLauncher(roslaunch.scriptapi.ROSLaunch):
                 files, is_core=False, port=port)
 
 
-_LAUNCHER = dict()
-
 # The following two methods are intended for use together. You need to be
 # aware of the following limitations:
 # `with_launch_file` should always be called first. That is:
@@ -83,37 +81,47 @@ def with_launch_file(package, launch, **kwargs):
     This and launch nodes work together gracefully, as long as you follow the
     guidelines outlined in `buzzmobile/tests/test_utils/launch_tools.py`.
     """
-    full_name = roslaunch.rlutil.resolve_launch_arguments([package, launch])
     def launcher(func):
         """Decorator function created by the decorator-gen.
         """
+        
         @functools.wraps(func)
         def new_test(self):
             """Wrapper around the user provided test that runs a launch file.
             """
+            # This should be in new_test and not outside because moving it
+            # outside causes errors at test collection time instead of test run
+            # time, at the cost of a minor decrease in performance.
+            try:
+                full_name = roslaunch.rlutil.resolve_launch_arguments([package,
+                    launch])
+            except roslaunch.core.RLException:
+                raise Exception('The package {}/{} does not exist. Make sure'
+                        'the name is correct and you have initialized your ROS'
+                        'environment'.format(package, launch))
             # set env variables and add argvs to sys.argv
             os.environ['ROS_MASTER_URI'] = self.rosmaster_uri
             new_argvs = ['{}:={}'.format(k, v) for k, v in kwargs.iteritems()]
             sys.argv.extend(new_argvs)
 
-            launch = ROSLauncher(full_name, port=self.port)
-            launch.start()
-            if self.port in _LAUNCHER:
+            ros_launcher = ROSLauncher(full_name, port=self.port)
+            ros_launcher.start()
+            if self.port in self.LAUNCHER:
                 raise RosLaunchException('Rosmaster port {} already in use. '
                 'You must call use @with_launch_file only once for any single '
                 'test, and before any @launch_node calls.'.format(self.port))
 
-            _LAUNCHER[self.port] = launch
+            self.LAUNCHER[self.port] = ros_launcher
 
             try:
                 temp = func(self)
             except Exception as exc:
                 raise exc
             finally:
-                _LAUNCHER[self.port].stop()
+                self.LAUNCHER[self.port].stop()
                 # clean argvs from sys.argv
                 sys.argv = sys.argv[:len(new_argvs)]
-                del _LAUNCHER[self.port]
+                del self.LAUNCHER[self.port]
             return temp
         return new_test
     return launcher
@@ -134,15 +142,15 @@ def launch_node(package, name, namespace=None):
             """Wrapper around the user-provided test that runs a ros node.
             """
             is_master = False
-            if self.port not in _LAUNCHER:
+            if self.port not in self.LAUNCHER:
                 # set env variables and add argvs to sys.argv
                 os.environ['ROS_MASTER_URI'] = self.rosmaster_uri
                 launch = ROSLauncher([], port=self.port)
                 launch.start()
-                _LAUNCHER[self.port] = launch
+                self.LAUNCHER[self.port] = launch
                 is_master = True
             else:
-                launch = _LAUNCHER[self.port]
+                launch = self.LAUNCHER[self.port]
 
             env = {'ROS_MASTER_URI': self.rosmaster_uri}
             node = roslaunch.core.Node(package, name, namespace=namespace,
@@ -162,8 +170,8 @@ def launch_node(package, name, namespace=None):
             finally:
                 process.stop()
             if is_master:
-                _LAUNCHER[self.port].stop()
-                del _LAUNCHER[self.port]
+                self.LAUNCHER[self.port].stop()
+                del self.LAUNCHER[self.port]
             return temp
 
         return new_test
