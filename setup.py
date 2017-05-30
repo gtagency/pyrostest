@@ -25,6 +25,9 @@ setup(
     description='The most lit ros testing framework',
     long_description=long_description,
     packages=['pyrostest'],
+    package_data={
+        'nodes': ['data/*']
+    },
     install_requires=required,
     tests_require=test,
     url='https://github.com/gtagency/pyrostest',

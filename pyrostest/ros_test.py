@@ -8,7 +8,7 @@ it over the system.
 
 import contextlib
 import cPickle as pickle
-import os
+import pkg_resources
 import subprocess
 import time
 import threading
@@ -39,8 +39,7 @@ class MockPublisher(object):
         pub_data = pickle.dumps((topic, msg_type, queue_size))
         # dynamically looks up the location of the publisher.py file in
         # relation to this file (they should be in the same dir)
-        this_dir = os.path.dirname(os.path.abspath(__file__))
-        location = os.path.join(this_dir, 'publisher.py')
+        location = pkg_resources.resource_string(__name__, "publisher.py")
         self.proc = subprocess.Popen([location, pub_data],
                 stdin=subprocess.PIPE)
 
@@ -66,8 +65,7 @@ class MockSubscriber(object):
         self.msg_type = msg_type
         self.killed = False
 
-        this_dir = os.path.dirname(os.path.abspath(__file__))
-        location = os.path.join(this_dir, 'subscriber.py')
+        location = pkg_resources.resource_string(__name__, "subscriber.py")
         self.proc = subprocess.Popen([location,
             pickle.dumps((topic, msg_type))], stdout=subprocess.PIPE)
         self._message = None
