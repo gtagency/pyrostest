@@ -32,5 +32,5 @@ def subscribe(topic, msg_type):
 
 
 if __name__ == '__main__':
-    ROSTOPIC, ROSMSG_TYPE = pickle.loads(sys.argv[1])
+    ROSTOPIC, ROSMSG_TYPE = pickle.loads(sys.argv[-1])
     subscribe(ROSTOPIC, ROSMSG_TYPE)

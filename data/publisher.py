@@ -32,5 +32,5 @@ def publish(topic, msg_type):
 
 
 if __name__ == '__main__':
-    ROSTOPIC, ROSMSG_TYPE, QUEUE_SIZE = pickle.loads(sys.argv[1])
+    ROSTOPIC, ROSMSG_TYPE, QUEUE_SIZE = pickle.loads(sys.argv[-1])
     publish(ROSTOPIC, ROSMSG_TYPE)
