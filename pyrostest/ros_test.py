@@ -39,8 +39,8 @@ class MockPublisher(object):
         pub_data = pickle.dumps((topic, msg_type, queue_size))
         # dynamically looks up the location of the publisher.py file in
         # relation to this file (they should be in the same dir)
-        location = pkg_resources.resource_string(__name__, "publisher.py")
-        self.proc = subprocess.Popen([location, pub_data],
+        location = pkg_resources.resource_filename(__name__, "publisher.py")
+        self.proc = subprocess.Popen(['python', location, pub_data],
                 stdin=subprocess.PIPE)
 
     def send(self, value):
@@ -65,8 +65,8 @@ class MockSubscriber(object):
         self.msg_type = msg_type
         self.killed = False
 
-        location = pkg_resources.resource_string(__name__, "subscriber.py")
-        self.proc = subprocess.Popen([location,
+        location = pkg_resources.resource_filename(__name__, "subscriber.py")
+        self.proc = subprocess.Popen(['python', location,
             pickle.dumps((topic, msg_type))], stdout=subprocess.PIPE)
         self._message = None
 
