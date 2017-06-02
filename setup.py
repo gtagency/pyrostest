@@ -26,7 +26,7 @@ setup(
     long_description=long_description,
     packages=['pyrostest'],
     package_data={
-        'pyrostest': ['data/*']
+        'pyrostest': ['data/*.py']
     },
     install_requires=required,
     tests_require=test,
