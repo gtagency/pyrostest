@@ -18,7 +18,7 @@ sudo apt-get install -y python-catkin-pkg python-rosdep ros-indigo-catkin ros-in
 # Install our project globally
 cd ~/$CIRCLE_PROJECT_REPONAME
 python setup.py bdist_wheel
-pip install dist/pyrostest-*
+pip install dist/pyrostest-?.?.?-py2-none-any.whl
 cd ~
 
 # Copy the rospackage to the catkin workspace
