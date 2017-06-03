@@ -18,6 +18,8 @@ import unittest
 
 import pyrostest.rostest_utils
 
+FileNotFoundError = IOError
+
 
 class TimeoutError(Exception):
     """Py3 shim, represents no response from a syscall.
