@@ -21,12 +21,12 @@ test = [
 
 setup(
     name='pyrostest',
-    version='0.1.7',
+    version='0.1.6',
     description='The most lit ros testing framework',
     long_description=long_description,
     packages=['pyrostest'],
     package_data={
-        'pyrostest': ['data/*.py']
+        'pyrostest': ['data/*']
     },
     install_requires=required,
     tests_require=test,
