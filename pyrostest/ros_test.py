@@ -8,6 +8,7 @@ it over the system.
 
 import contextlib
 import cPickle as pickle
+import os
 import pkg_resources
 import subprocess
 import time
@@ -40,6 +41,9 @@ class MockPublisher(object):
         # dynamically looks up the location of the publisher.py file in
         # relation to this file (they should be in the same dir)
         location = pkg_resources.resource_filename(__name__, "publisher.py")
+        if not os.path.isfile(location):
+            raise FileNotFoundError('{} cannot be located'.format(location))
+
         self.proc = subprocess.Popen(['python', location, pub_data],
                 stdin=subprocess.PIPE)
 
@@ -66,6 +70,8 @@ class MockSubscriber(object):
         self.killed = False
 
         location = pkg_resources.resource_filename(__name__, "subscriber.py")
+        if not os.path.isfile(location):
+            raise FileNotFoundError('{} cannot be located'.format(location))
         self.proc = subprocess.Popen(['python', location,
             pickle.dumps((topic, msg_type))], stdout=subprocess.PIPE)
         self._message = None
