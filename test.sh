@@ -18,7 +18,7 @@ sudo apt-get install -y python-catkin-pkg python-rosdep ros-indigo-catkin ros-in
 # Install our project globally
 cd ~/$CIRCLE_PROJECT_REPONAME
 python setup.py bdist_wheel
-pip install psutil=5.1.3
+pip install 'psutil==5.1.3'
 pip install pyrostest --no-index --find-links=dist/
 cd ~
 
