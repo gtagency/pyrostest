@@ -19,7 +19,7 @@ sudo apt-get install -y python-catkin-pkg python-rosdep ros-indigo-catkin ros-in
 cd ~/$CIRCLE_PROJECT_REPONAME
 python setup.py sdist
 pip install 'psutil==5.1.3'
-pip install pyrostest --no-index --find-links=dist/
+sudo -H pip install pyrostest --no-index --find-links=dist/
 cd ~
 
 
