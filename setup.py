@@ -21,10 +21,13 @@ test = [
 
 setup(
     name='pyrostest',
-    version='0.1.2',
+    version='0.1.8',
     description='The most lit ros testing framework',
     long_description=long_description,
     packages=['pyrostest'],
+    package_data={
+        'pyrostest': ['data/*']
+    },
     install_requires=required,
     tests_require=test,
     url='https://github.com/gtagency/pyrostest',

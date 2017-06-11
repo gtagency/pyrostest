@@ -9,6 +9,7 @@ it over the system.
 import contextlib
 import cPickle as pickle
 import os
+import pkg_resources
 import subprocess
 import time
 import threading
@@ -16,6 +17,8 @@ from StringIO import StringIO
 import unittest
 
 import pyrostest.rostest_utils
+
+FileNotFoundError = IOError
 
 
 class TimeoutError(Exception):
@@ -39,9 +42,11 @@ class MockPublisher(object):
         pub_data = pickle.dumps((topic, msg_type, queue_size))
         # dynamically looks up the location of the publisher.py file in
         # relation to this file (they should be in the same dir)
-        this_dir = os.path.dirname(os.path.abspath(__file__))
-        location = os.path.join(this_dir, 'publisher.py')
-        self.proc = subprocess.Popen([location, pub_data],
+        location = pkg_resources.resource_filename(__name__, "publisher.py")
+        if not os.path.isfile(location):
+            raise FileNotFoundError('{} cannot be located'.format(location))
+
+        self.proc = subprocess.Popen(['python', location, pub_data],
                 stdin=subprocess.PIPE)
 
     def send(self, value):
@@ -67,9 +72,10 @@ class MockSubscriber(object):
         self.msg_type = msg_type
         self.killed = False
 
-        this_dir = os.path.dirname(os.path.abspath(__file__))
-        location = os.path.join(this_dir, 'subscriber.py')
-        self.proc = subprocess.Popen([location,
+        location = pkg_resources.resource_filename(__name__, "subscriber.py")
+        if not os.path.isfile(location):
+            raise FileNotFoundError('{} cannot be located'.format(location))
+        self.proc = subprocess.Popen(['python', location,
             pickle.dumps((topic, msg_type))], stdout=subprocess.PIPE)
         self._message = None
 
