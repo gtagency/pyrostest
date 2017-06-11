@@ -54,6 +54,7 @@ class MockPublisher(object):
         """Kills the publisher ros node process.
         """
         self.proc.kill()
+        self.proc.wait()
 
 
 class MockSubscriber(object):
