@@ -45,7 +45,7 @@ class MockPublisher(object):
         location = pkg_resources.resource_filename(__name__, "publisher.py")
         if not os.path.isfile(location):
             this_dir = os.path.dirname(os.path.abspath(__file__))
-            data_dir = this_dir + '..' + 'data'
+            data_dir = os.path.join(this_dir, '..', 'data')
             location = os.path.join(data_dir, 'publisher.py')
         if not os.path.isfile(location):
             raise FileNotFoundError('{} cannot be located'.format(location))
@@ -79,7 +79,8 @@ class MockSubscriber(object):
         location = pkg_resources.resource_filename(__name__, "subscriber.py")
         if not os.path.isfile(location):
             this_dir = os.path.dirname(os.path.abspath(__file__))
-            data_dir = this_dir + '..' + 'data'
+            data_dir = os.path.join(this_dir, '..', 'data')
+            location = os.path.join(data_dir, 'publisher.py')
             location = os.path.join(data_dir, 'subscriber.py')
         if not os.path.isfile(location):
             raise FileNotFoundError('{} cannot be located'.format(location))
