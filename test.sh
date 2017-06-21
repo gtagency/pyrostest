@@ -16,10 +16,7 @@ sudo apt-get update -qq
 sudo apt-get install -y python-catkin-pkg python-rosdep ros-indigo-catkin ros-indigo-ros ros-indigo-roslaunch build-essential ros-indigo-rosnode
 
 # Install our project globally
-cd ~/$CIRCLE_PROJECT_REPONAME
-python setup.py sdist
-pip install 'psutil==5.1.3'
-pip install pyrostest --no-index --find-links=dist/
+pip install -e ~/$CIRCLE_PROJECT_REPONAME
 cd ~
 
 
