@@ -32,6 +32,19 @@ class NoMessage(Exception):
     """
     pass
 
+def _resolve_location(binary_name):
+    """Find the location of a mock node to run.
+    """
+    location = pkg_resources.resource_filename(__name__, binary_name)
+    if not os.path.isfile(location):
+        this_dir = os.path.dirname(os.path.abspath(__file__))
+        data_dir = os.path.join(this_dir, '..', 'data')
+        location = os.path.join(data_dir, binary_name)
+    if not os.path.isfile(location):
+        raise FileNotFoundError('{} cannot be located'.format(location))
+    return location
+
+
 
 class MockPublisher(object):
     """Mock of a node object for testing.
@@ -40,16 +53,7 @@ class MockPublisher(object):
         self.topic = topic
         self.msg_type = msg_type
         pub_data = pickle.dumps((topic, msg_type, queue_size))
-        # dynamically looks up the location of the publisher.py file in
-        # relation to this file (they should be in the same dir)
-        location = pkg_resources.resource_filename(__name__, "publisher.py")
-        if not os.path.isfile(location):
-            this_dir = os.path.dirname(os.path.abspath(__file__))
-            data_dir = os.path.join(this_dir, '..', 'data')
-            location = os.path.join(data_dir, 'publisher.py')
-        if not os.path.isfile(location):
-            raise FileNotFoundError('{} cannot be located'.format(location))
-
+        location = _resolve_location('publisher.py')
         self.proc = subprocess.Popen(['python', location, pub_data],
                 stdin=subprocess.PIPE)
 
@@ -76,14 +80,7 @@ class MockSubscriber(object):
         self.msg_type = msg_type
         self.killed = False
 
-        location = pkg_resources.resource_filename(__name__, "subscriber.py")
-        if not os.path.isfile(location):
-            this_dir = os.path.dirname(os.path.abspath(__file__))
-            data_dir = os.path.join(this_dir, '..', 'data')
-            location = os.path.join(data_dir, 'publisher.py')
-            location = os.path.join(data_dir, 'subscriber.py')
-        if not os.path.isfile(location):
-            raise FileNotFoundError('{} cannot be located'.format(location))
+        location = _resolve_location('subscriber.py')
         self.proc = subprocess.Popen(['python', location,
             pickle.dumps((topic, msg_type))], stdout=subprocess.PIPE)
         self._message = None
