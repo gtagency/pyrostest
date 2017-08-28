@@ -20,6 +20,11 @@ class TestAddOne(pyrostest.RosTest):
                 sub.send(Int32(7))
                 assert out2.message.data == 8
 
+    @pyrostest.launch_node('pyrostest', 'add_one.py')
+    def test_unused_node(self):
+        with self.mock_pub('/pub_val', Int32, queue_size=0) as sub:
+            with self.check_topic('/pyrostest/add_one', Int32) as out:
+                pass
 
 class TestPubFoo(pyrostest.RosTest):
     @pyrostest.with_launch_file('pyrostest', 'launch.launch')
@@ -27,7 +32,6 @@ class TestPubFoo(pyrostest.RosTest):
     def test_foo_node(self):
         with self.check_topic('/pub_val', Int32) as out:
             assert out.message.data == 7
-
 
 class TestSequence(pyrostest.RosTest):
     @pyrostest.with_launch_file('pyrostest', 'launch.launch')
