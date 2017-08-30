@@ -2,6 +2,7 @@ from std_msgs.msg import Int32
 
 import pyrostest
 
+
 class TestAddOne(pyrostest.RosTest):
     @pyrostest.launch_node('pyrostest', 'add_one.py')
     def test_add_one_node_single(self):
@@ -26,12 +27,14 @@ class TestAddOne(pyrostest.RosTest):
             with self.check_topic('/pyrostest/add_one', Int32) as out:
                 pass
 
+
 class TestPubFoo(pyrostest.RosTest):
     @pyrostest.with_launch_file('pyrostest', 'launch.launch')
     @pyrostest.launch_node('pyrostest', 'pub_foo.py')
     def test_foo_node(self):
         with self.check_topic('/pub_val', Int32) as out:
             assert out.message.data == 7
+
 
 class TestSequence(pyrostest.RosTest):
     @pyrostest.with_launch_file('pyrostest', 'launch.launch')
