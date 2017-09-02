@@ -151,9 +151,9 @@ def _await_node(topic, prefix, rosmaster_uri, timeout):
                           args=(topic, prefix, rosmaster_uri, is_accessed))
     bg.start()
     is_accessed.wait(timeout)
-    bg.kill()
     if not is_accessed.isSet():
-        raise NoNode()
+        raise NoNode('No node was created for "{}", in namespace "{}"').format(
+                topic, prefix)
 
 
 
