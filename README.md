@@ -28,7 +28,7 @@ from std_msgs.msg import Float64
 class TestAddOne(RosTest):
     @launch_node('pkg', 'add_one')
     def test_add_one(self):
-        with self.mock_pub('/input', Flaot64, queue_size=0) as p:
+        with self.mock_pub('/input', Float64, queue_size=0) as p:
             with self.check_topic('/output', Float64) as r:
                 p.send(Float64(7))
                 assert r.message.data == 8  # or self.assertEqual
