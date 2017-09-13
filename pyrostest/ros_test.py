@@ -32,6 +32,11 @@ class NoMessage(Exception):
     """
     pass
 
+class NoNode(Exception):
+    """A node was expected, but could not be found in time.
+    """
+    pass
+
 def _resolve_location(binary_name):
     """Find the location of a mock node to run.
     """
@@ -129,15 +134,28 @@ class MockSubscriber(object):
             self._message = msg
         return self._message
 
-
-def _await_node(topic, prefix, rosmaster_uri):
-    """Helper to block until a node is availible in ROS.
-    """
+def _check_is_availible(topic, prefix, rosmaster_uri, event):
     no_ns = topic.split('/')[-1]
     while not any(nn.split('/')[-1].startswith(''.join([prefix, '_', no_ns]))
             for nn in
             pyrostest.rostest_utils.my_get_node_names(uri=rosmaster_uri)):
         time.sleep(.1)
+    event.set()
+
+
+def _await_node(topic, prefix, rosmaster_uri, timeout):
+    """Helper to block until a node is availible in ROS.
+    """
+    is_accessed = threading.Event()
+    bg = threading.Thread(name='wait for node', target=_check_is_availible,
+                          args=(topic, prefix, rosmaster_uri, is_accessed))
+    bg.start()
+    is_accessed.wait(timeout)
+    if not is_accessed.isSet():
+        raise NoNode('No node was created for "{}", in namespace "{}"').format(
+                topic, prefix)
+
+
 
 
 class RosTest(unittest.TestCase):
@@ -153,12 +171,13 @@ class RosTest(unittest.TestCase):
         self.LAUNCHER = dict()
 
     @contextlib.contextmanager
-    def check_topic(self, topic, rosmsg_type, timeout=10):
+    def check_topic(self, topic, rosmsg_type, timeout=10, node_timeout=10):
         """Context manager that monitors a rostopic and gets a message sent to
         it.
         """
         test_node = MockSubscriber(topic, rosmsg_type, timeout=timeout)
-        _await_node(topic, 'mock_subscribe', self.rosmaster_uri)
+        _await_node(topic, 'mock_subscribe', self.rosmaster_uri,
+                    timeout=node_timeout)
 
         try:
             yield test_node
@@ -166,11 +185,12 @@ class RosTest(unittest.TestCase):
             test_node.kill()
 
     @contextlib.contextmanager
-    def mock_pub(self, topic, rosmsg_type, queue_size=1):
+    def mock_pub(self, topic, rosmsg_type, queue_size=1, node_timeout=10):
         """Mocks a node and cleans it up when done.
         """
         pub = MockPublisher(topic, rosmsg_type, queue_size)
-        _await_node(topic, 'mock_publish', self.rosmaster_uri)
+        _await_node(topic, 'mock_publish', self.rosmaster_uri,
+                    timeout=node_timeout)
         try:
             yield pub
         finally:
