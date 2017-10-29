@@ -22,7 +22,7 @@ test = [
 
 setup(
     name='pyrostest',
-    version='0.1.12',
+    version='0.1.13',
     description='The most lit ros testing framework',
     long_description=long_description,
     packages=['pyrostest'],
