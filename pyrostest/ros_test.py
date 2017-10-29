@@ -12,6 +12,7 @@ import pkg_resources
 import subprocess
 import time
 import threading
+import six
 from six import StringIO
 from six.moves import cPickle as pickle
 import unittest
@@ -157,14 +158,14 @@ def _await_node(topic, prefix, rosmaster_uri, timeout):
 
 
 
-
+@six.add_metaclass(pyrostest.rostest_utils.RosTestMeta)
 class RosTest(unittest.TestCase):
     """A subclass of TestCase that exposes some additional ros-related attrs.
 
     self.port is the port this instance will run on.
-    self.rosmaster_uri is equivalent to the ROS_MASTER_URI environmental var
+    self.rosmaster_uri is equivalent to the ROS_MASTER_URI environmental var,
+        and is set by the metaclass.
     """
-    __metaclass__ = pyrostest.rostest_utils.RosTestMeta
 
     def __init__(self, *args, **kwargs):
         super(RosTest, self).__init__(*args, **kwargs)
