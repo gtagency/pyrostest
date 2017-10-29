@@ -12,7 +12,8 @@ with codecs.open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = '\n' + f.read()
 
 required = [
-    'psutil==5.1.3'
+    'psutil==5.1.3',
+    'six=1.11.0',
     ]
 
 test = [
@@ -39,6 +40,7 @@ setup(
     classifiers=[
         'Programming Language :: Python',
         'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.5',
         ],
     )
 
