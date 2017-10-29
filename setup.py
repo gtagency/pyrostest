@@ -12,7 +12,8 @@ with codecs.open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = '\n' + f.read()
 
 required = [
-    'psutil==5.1.3'
+    'psutil==5.1.3',
+    'six==1.11.0',
     ]
 
 test = [
@@ -21,7 +22,7 @@ test = [
 
 setup(
     name='pyrostest',
-    version='0.1.12',
+    version='0.1.13',
     description='The most lit ros testing framework',
     long_description=long_description,
     packages=['pyrostest'],
@@ -39,6 +40,7 @@ setup(
     classifiers=[
         'Programming Language :: Python',
         'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.5',
         ],
     )
 
