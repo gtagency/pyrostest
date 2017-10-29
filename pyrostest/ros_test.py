@@ -7,13 +7,13 @@ it over the system.
 """
 
 import contextlib
-import cPickle as pickle
 import os
 import pkg_resources
 import subprocess
 import time
 import threading
-from StringIO import StringIO
+from six import StringIO
+from six.moves import cPickle as pickle
 import unittest
 
 import pyrostest.rostest_utils
