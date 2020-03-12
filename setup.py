@@ -12,7 +12,7 @@ with codecs.open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = '\n' + f.read()
 
 required = [
-    'psutil==5.1.3',
+    'psutil==5.6.6',
     'six==1.11.0',
     ]
 
